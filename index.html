@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>王者比赛报名与赛事管理系统 - 电竞正式版</title>
+  <title>王者比赛报名与赛事管理系统 - Supabase最终版</title>
   <style>
     * { box-sizing: border-box; }
     :root{
@@ -17,15 +17,11 @@
       --pink:#ec4899;
       --yellow:#fbbf24;
       --green:#10b981;
-      --white:#f8fafc;
       --text:#dbeafe;
       --muted:#94a3b8;
-      --panel:rgba(255,255,255,.06);
-      --panel2:rgba(255,255,255,.04);
       --border:rgba(255,255,255,.10);
       --shadow:0 10px 30px rgba(0,0,0,.35);
     }
-
     body{
       margin:0;
       color:var(--text);
@@ -37,377 +33,132 @@
         linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
       min-height:100vh;
     }
-
     .grid-overlay{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
+      position:fixed; inset:0; pointer-events:none;
       background:
         linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
-      background-size: 40px 40px;
-      opacity:.35;
-      z-index:0;
+      background-size:40px 40px; opacity:.35; z-index:0;
     }
-
     header{
-      position:relative;
-      z-index:1;
-      text-align:center;
-      padding:32px 16px 24px;
+      position:relative; z-index:1; text-align:center; padding:32px 16px 24px;
       background:linear-gradient(90deg, rgba(34,211,238,.08), rgba(139,92,246,.08), rgba(239,68,68,.08));
-      border-bottom:1px solid rgba(255,255,255,.08);
-      box-shadow:0 8px 30px rgba(0,0,0,.25);
+      border-bottom:1px solid rgba(255,255,255,.08); box-shadow:0 8px 30px rgba(0,0,0,.25);
     }
-
     header h1{
-      margin:0;
-      font-size:34px;
-      color:#fff;
-      letter-spacing:2px;
+      margin:0; font-size:34px; color:#fff; letter-spacing:2px;
       text-shadow:0 0 20px rgba(34,211,238,.3), 0 0 20px rgba(239,68,68,.15);
     }
-
-    header p{
-      margin:10px 0 0;
-      color:#cbd5e1;
-      font-size:14px;
-    }
-
+    header p{ margin:10px 0 0; color:#cbd5e1; font-size:14px; }
     .hero-pill{
-      display:inline-block;
-      margin-top:14px;
-      padding:8px 16px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.05);
-      color:#e0f2fe;
-      font-size:13px;
-      box-shadow:0 0 16px rgba(34,211,238,.08);
+      display:inline-block; margin-top:14px; padding:8px 16px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.05);
+      color:#e0f2fe; font-size:13px;
     }
-
     nav{
-      position:sticky;
-      top:0;
-      z-index:10;
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:center;
-      gap:10px;
-      padding:14px;
-      background:rgba(5,10,20,.78);
-      backdrop-filter:blur(12px);
+      position:sticky; top:0; z-index:10; display:flex; flex-wrap:wrap; justify-content:center;
+      gap:10px; padding:14px; background:rgba(5,10,20,.78); backdrop-filter:blur(12px);
       border-bottom:1px solid rgba(255,255,255,.08);
     }
-
     nav button{
-      border:none;
-      color:#fff;
-      cursor:pointer;
-      padding:10px 18px;
-      font-size:14px;
-      border-radius:12px;
+      border:none; color:#fff; cursor:pointer; padding:10px 18px; font-size:14px; border-radius:12px;
       background:linear-gradient(90deg, rgba(59,130,246,.95), rgba(139,92,246,.95));
-      box-shadow:0 0 14px rgba(59,130,246,.2);
-      transition:.2s ease;
+      box-shadow:0 0 14px rgba(59,130,246,.2); transition:.2s ease;
     }
-
-    nav button:hover{
-      transform:translateY(-1px);
-      box-shadow:0 0 20px rgba(139,92,246,.28);
-    }
-
-    .container{
-      position:relative;
-      z-index:1;
-      max-width:1400px;
-      margin:24px auto;
-      padding:0 16px 40px;
-    }
-
+    nav button:hover{ transform:translateY(-1px); box-shadow:0 0 20px rgba(139,92,246,.28); }
+    .container{ position:relative; z-index:1; max-width:1400px; margin:24px auto; padding:0 16px 40px; }
     .card{
-      display:none;
-      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:22px;
-      margin-bottom:18px;
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(10px);
+      display:none; background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border:1px solid var(--border); border-radius:18px; padding:22px; margin-bottom:18px;
+      box-shadow:var(--shadow); backdrop-filter:blur(10px);
     }
-
     .card.active{ display:block; }
-
-    .title-line{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-bottom:14px;
-    }
-
+    .title-line{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
     .title-line::before{
-      content:"";
-      width:6px;
-      height:24px;
-      border-radius:10px;
+      content:""; width:6px; height:24px; border-radius:10px;
       background:linear-gradient(180deg, var(--cyan), var(--pink));
       box-shadow:0 0 12px rgba(34,211,238,.45);
     }
-
-    h2,h3{
-      margin:0;
-      color:#fff;
-    }
-
+    h2,h3{ margin:0; color:#fff; }
     .notice{
       background:linear-gradient(90deg, rgba(251,191,36,.12), rgba(239,68,68,.08));
-      border-left:4px solid var(--yellow);
-      padding:12px 14px;
-      border-radius:10px;
-      margin-bottom:16px;
-      line-height:1.75;
-      color:#fff7d6;
+      border-left:4px solid var(--yellow); padding:12px 14px; border-radius:10px; margin-bottom:16px;
+      line-height:1.75; color:#fff7d6;
     }
-
-    .row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-    }
-
-    .row-3{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:14px;
-    }
-
-    .row-4{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr 1fr;
-      gap:14px;
-    }
-
-    .form-group{
-      margin-bottom:14px;
-    }
-
-    label{
-      display:block;
-      margin-bottom:8px;
-      color:#dbeafe;
-      font-weight:700;
-      font-size:14px;
-    }
-
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .row-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+    .row-4{ display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:14px; }
+    .form-group{ margin-bottom:14px; }
+    label{ display:block; margin-bottom:8px; color:#dbeafe; font-weight:700; font-size:14px; }
     input,select,textarea{
-      width:100%;
-      padding:11px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.08);
-      outline:none;
-      font-size:14px;
-      background:rgba(255,255,255,.95);
-      color:#111827;
+      width:100%; padding:11px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.08);
+      outline:none; font-size:14px; background:rgba(255,255,255,.95); color:#111827;
     }
-
-    textarea{
-      min-height:90px;
-      resize:vertical;
-    }
-
-    .checkbox-group{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
-      gap:8px;
-    }
-
+    textarea{ min-height:90px; resize:vertical; }
+    .checkbox-group{ display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; }
     .checkbox-group label{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:10px;
-      border-radius:10px;
-      background:rgba(255,255,255,.06);
-      font-weight:400;
-      color:#e2e8f0;
+      display:flex; align-items:center; gap:8px; padding:10px; border-radius:10px;
+      background:rgba(255,255,255,.06); font-weight:400; color:#e2e8f0;
     }
-
     .checkbox-group input{ width:auto; }
-
     .btn{
-      border:none;
-      cursor:pointer;
-      color:#fff;
-      padding:10px 16px;
-      border-radius:12px;
-      font-size:14px;
-      margin-right:8px;
-      margin-top:6px;
-      background:linear-gradient(90deg, #f59e0b, #ef4444);
+      border:none; cursor:pointer; color:#fff; padding:10px 16px; border-radius:12px; font-size:14px;
+      margin-right:8px; margin-top:6px; background:linear-gradient(90deg, #f59e0b, #ef4444);
       box-shadow:0 0 16px rgba(239,68,68,.16);
     }
-
-    .btn.secondary{
-      background:linear-gradient(90deg, #10b981, #06b6d4);
-      box-shadow:0 0 16px rgba(16,185,129,.16);
-    }
-
-    .btn.blue{
-      background:linear-gradient(90deg, #3b82f6, #8b5cf6);
-    }
-
-    .btn.gray{
-      background:linear-gradient(90deg, #64748b, #475569);
-    }
-
-    .toolbar{
-      display:grid;
-      grid-template-columns:2fr 1fr 1fr 1fr;
-      gap:12px;
-      margin-bottom:12px;
-    }
-
+    .btn.secondary{ background:linear-gradient(90deg, #10b981, #06b6d4); }
+    .btn.blue{ background:linear-gradient(90deg, #3b82f6, #8b5cf6); }
+    .btn.gray{ background:linear-gradient(90deg, #64748b, #475569); }
+    .toolbar{ display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
     .panel{
-      background:rgba(255,255,255,.045);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:14px;
-      padding:14px;
+      background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.08);
+      border-radius:14px; padding:14px;
     }
-
-    .stat-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:14px;
-    }
-
+    .stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
     .stat-card{
       background:linear-gradient(135deg, rgba(34,211,238,.08), rgba(139,92,246,.06), rgba(239,68,68,.06));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:16px;
-      padding:16px;
-      box-shadow:0 0 18px rgba(34,211,238,.05);
+      border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px;
     }
-
-    .stat-card h3{
-      font-size:14px;
-      color:#cbd5e1;
-      margin-bottom:8px;
-    }
-
-    .stat-card p{
-      margin:0;
-      font-size:28px;
-      font-weight:700;
-      color:#fff;
-    }
-
+    .stat-card h3{ font-size:14px; color:#cbd5e1; margin-bottom:8px; }
+    .stat-card p{ margin:0; font-size:28px; font-weight:700; color:#fff; }
     table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:12px;
-      background:rgba(255,255,255,.03);
-      border-radius:12px;
-      overflow:hidden;
+      width:100%; border-collapse:collapse; margin-top:12px; background:rgba(255,255,255,.03);
+      border-radius:12px; overflow:hidden;
     }
-
     th,td{
-      padding:10px;
-      border-bottom:1px solid rgba(255,255,255,.07);
-      text-align:left;
-      font-size:14px;
-      vertical-align:top;
+      padding:10px; border-bottom:1px solid rgba(255,255,255,.07);
+      text-align:left; font-size:14px; vertical-align:top;
     }
-
-    th{
-      background:rgba(255,255,255,.08);
-      color:#fff;
-      cursor:pointer;
-      user-select:none;
-    }
-
-    tr:hover td{
-      background:rgba(255,255,255,.025);
-    }
-
+    th{ background:rgba(255,255,255,.08); color:#fff; }
+    tr:hover td{ background:rgba(255,255,255,.025); }
     .tag{
-      display:inline-block;
-      padding:4px 8px;
-      margin:2px 6px 2px 0;
-      border-radius:999px;
-      font-size:12px;
-      background:rgba(59,130,246,.18);
-      color:#dbeafe;
-      border:1px solid rgba(59,130,246,.18);
+      display:inline-block; padding:4px 8px; margin:2px 6px 2px 0; border-radius:999px; font-size:12px;
+      background:rgba(59,130,246,.18); color:#dbeafe; border:1px solid rgba(59,130,246,.18);
     }
-
     .pill{
-      display:inline-block;
-      padding:5px 10px;
-      margin:4px 8px 0 0;
-      border-radius:999px;
-      font-size:12px;
-      color:#fff;
-      background:rgba(16,185,129,.18);
-      border:1px solid rgba(16,185,129,.18);
+      display:inline-block; padding:5px 10px; margin:4px 8px 0 0; border-radius:999px; font-size:12px;
+      color:#fff; background:rgba(16,185,129,.18); border:1px solid rgba(16,185,129,.18);
     }
-
     .team-box{
-      background:rgba(255,255,255,.045);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:14px;
-      padding:14px;
-      margin-bottom:12px;
+      background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.08);
+      border-radius:14px; padding:14px; margin-bottom:12px;
     }
-
-    .divider{
-      height:1px;
-      background:rgba(255,255,255,.08);
-      margin:20px 0;
-    }
-
+    .divider{ height:1px; background:rgba(255,255,255,.08); margin:20px 0; }
     .small{ color:var(--muted); font-size:13px; }
     .danger{ color:#fecaca; }
-    .success{ color:#bbf7d0; }
-    .warning{ color:#fde68a; }
-
     .qr-box{
-      display:grid;
-      grid-template-columns:220px 1fr;
-      gap:18px;
-      align-items:center;
-      background:rgba(255,255,255,.045);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:16px;
-      padding:16px;
+      display:grid; grid-template-columns:220px 1fr; gap:18px; align-items:center;
+      background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.08);
+      border-radius:16px; padding:16px;
     }
-
     .qr-img-wrap{
-      background:#fff;
-      border-radius:12px;
-      padding:12px;
-      text-align:center;
-      min-height:220px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      background:#fff; border-radius:12px; padding:12px; text-align:center; min-height:220px;
+      display:flex; align-items:center; justify-content:center;
     }
-
-    .qr-img-wrap img{
-      max-width:100%;
-      display:block;
-    }
-
-    .footer{
-      text-align:center;
-      color:#94a3b8;
-      padding:24px 12px 36px;
-      font-size:14px;
-    }
-
+    .qr-img-wrap img{ max-width:100%; display:block; }
+    .footer{ text-align:center; color:#94a3b8; padding:24px 12px 36px; font-size:14px; }
     @media (max-width: 1100px){
-      .row,.row-3,.row-4,.toolbar,.stat-grid,.qr-box{
-        grid-template-columns:1fr;
-      }
+      .row,.row-3,.row-4,.toolbar,.stat-grid,.qr-box{ grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -417,7 +168,7 @@
 <header>
   <h1>王者比赛报名与赛事管理系统</h1>
   <p>五一劳动节 · 5v5峡谷征召比赛 · 28队组织内赛事</p>
-  <div class="hero-pill">电竞科技风UI · 报名 / 赛程 / 数据 / 公告 / 后台管理一体化</div>
+  <div class="hero-pill">Supabase 云端正式版 · 报名 / 选手 / 战队 / 比赛 / 公告 / 数据</div>
 </header>
 
 <nav>
@@ -434,10 +185,8 @@
   <section id="home" class="card active">
     <div class="title-line"><h2>赛事首页</h2></div>
     <div class="notice">
-      本系统用于王者比赛报名、战队管理、赛程安排、比赛结果录入、选手评分统计、公告发布与报名二维码分发。<br>
-      选手可查看自己的比赛时间、对手、对手队长联系方式、个人战绩等信息。
+      本系统已接入 Supabase 云端数据库。报名、战队、比赛、公告和数据统计将统一存储并实时刷新显示。
     </div>
-
     <div class="stat-grid">
       <div class="stat-card"><h3>报名选手</h3><p id="homePlayers">0</p></div>
       <div class="stat-card"><h3>战队数量</h3><p id="homeTeams">0</p></div>
@@ -446,7 +195,6 @@
     </div>
 
     <div class="divider"></div>
-
     <div class="title-line"><h3>报名二维码</h3></div>
     <div class="qr-box">
       <div class="qr-img-wrap">
@@ -459,10 +207,6 @@
         </div>
         <button class="btn blue" onclick="generateSignupQR()">生成报名二维码</button>
         <button class="btn secondary" onclick="fillCurrentUrl()">使用当前页面地址</button>
-        <p class="small" style="margin-top:10px;">
-          说明：将本网页上传到网站后，把最终网址填入这里，即可生成二维码。<br>
-          建议使用带 <strong>#signup</strong> 的地址，这样选手扫码后会直接进入报名页。
-        </p>
       </div>
     </div>
   </section>
@@ -479,7 +223,6 @@
         <input id="contact" type="text" placeholder="请输入手机号或微信号">
       </div>
     </div>
-
     <div class="row">
       <div class="form-group">
         <label>战队名</label>
@@ -494,7 +237,6 @@
         </select>
       </div>
     </div>
-
     <div class="row">
       <div class="form-group">
         <label>游戏ID</label>
@@ -509,7 +251,6 @@
         </select>
       </div>
     </div>
-
     <div class="form-group">
       <label>擅长位置（可多选）</label>
       <div class="checkbox-group">
@@ -520,21 +261,17 @@
         <label><input class="lane" type="checkbox" value="游走"> 游走</label>
       </div>
     </div>
-
     <div class="form-group">
       <label>备注</label>
       <textarea id="remark" placeholder="可填写段位、常用英雄等信息"></textarea>
     </div>
-
     <button class="btn" onclick="submitSignup()">提交报名</button>
     <button class="btn secondary" onclick="resetForm()">清空表单</button>
   </section>
 
   <section id="query" class="card">
     <div class="title-line"><h2>选手查询</h2></div>
-    <div class="notice">
-      输入你的姓名/昵称，可查看所属战队、比赛时间、对手是谁、对手队长和联系方式、比赛结果、评分、KDA、MVP等信息。
-    </div>
+    <div class="notice">输入你的姓名/昵称，可查看所属战队、相关比赛、对手及个人数据。</div>
     <div class="row">
       <div class="form-group">
         <label>姓名 / 昵称</label>
@@ -578,7 +315,6 @@
 
   <section id="stats" class="card">
     <div class="title-line"><h2>数据中心</h2></div>
-
     <div class="row">
       <div class="form-group">
         <label>战队积分榜排序方式</label>
@@ -652,7 +388,7 @@
 
     <div id="adminPanel" style="display:none; margin-top:20px;">
       <div class="notice">
-        已进入组织者后台。你可以管理选手、战队、赛程、比赛数据、评分、公告以及二维码报名链接。
+        已进入组织者后台。当前版本支持云端报名、选手管理、比赛管理、公告管理、KDA/MVP录入与数据榜刷新。
       </div>
 
       <div class="stat-grid">
@@ -677,7 +413,6 @@
         </select>
         <button class="btn secondary" onclick="renderAdminPlayers()">搜索/筛选</button>
       </div>
-
       <table>
         <thead>
           <tr>
@@ -701,18 +436,9 @@
         <h3>编辑选手</h3>
         <input type="hidden" id="editPlayerId">
         <div class="row-3">
-          <div class="form-group">
-            <label>姓名</label>
-            <input id="editPlayerName" type="text">
-          </div>
-          <div class="form-group">
-            <label>联系方式</label>
-            <input id="editPlayerContact" type="text">
-          </div>
-          <div class="form-group">
-            <label>战队名</label>
-            <input id="editPlayerTeam" type="text">
-          </div>
+          <div class="form-group"><label>姓名</label><input id="editPlayerName" type="text"></div>
+          <div class="form-group"><label>联系方式</label><input id="editPlayerContact" type="text"></div>
+          <div class="form-group"><label>战队名</label><input id="editPlayerTeam" type="text"></div>
         </div>
         <div class="row-3">
           <div class="form-group">
@@ -722,10 +448,7 @@
               <option value="组员">组员</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>游戏ID</label>
-            <input id="editPlayerGameId" type="text">
-          </div>
+          <div class="form-group"><label>游戏ID</label><input id="editPlayerGameId" type="text"></div>
           <div class="form-group">
             <label>平台</label>
             <select id="editPlayerPlatform">
@@ -734,14 +457,8 @@
             </select>
           </div>
         </div>
-        <div class="form-group">
-          <label>擅长位置（用顿号分隔）</label>
-          <input id="editPlayerLanes" type="text" placeholder="如：打野、中路">
-        </div>
-        <div class="form-group">
-          <label>备注</label>
-          <textarea id="editPlayerRemark"></textarea>
-        </div>
+        <div class="form-group"><label>擅长位置（用顿号分隔）</label><input id="editPlayerLanes" type="text"></div>
+        <div class="form-group"><label>备注</label><textarea id="editPlayerRemark"></textarea></div>
         <button class="btn" onclick="savePlayerEdit()">保存修改</button>
         <button class="btn gray" onclick="closePlayerEditor()">取消</button>
       </div>
@@ -755,22 +472,10 @@
 
       <div class="title-line"><h3>创建比赛</h3></div>
       <div class="row-4">
-        <div class="form-group">
-          <label>比赛轮次</label>
-          <input id="matchRound" type="text" placeholder="如：小组赛第1轮">
-        </div>
-        <div class="form-group">
-          <label>战队A</label>
-          <select id="teamASelect"></select>
-        </div>
-        <div class="form-group">
-          <label>战队B</label>
-          <select id="teamBSelect"></select>
-        </div>
-        <div class="form-group">
-          <label>比赛时间</label>
-          <input id="matchTime" type="text" placeholder="如：五一劳动节 14:00">
-        </div>
+        <div class="form-group"><label>比赛轮次</label><input id="matchRound" type="text" placeholder="如：小组赛第1轮"></div>
+        <div class="form-group"><label>战队A</label><select id="teamASelect"></select></div>
+        <div class="form-group"><label>战队B</label><select id="teamBSelect"></select></div>
+        <div class="form-group"><label>比赛时间</label><input id="matchTime" type="datetime-local"></div>
       </div>
       <div class="row">
         <div class="form-group">
@@ -781,10 +486,7 @@
             <option value="已结束">已结束</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>赛制说明</label>
-          <input id="matchNote" type="text" placeholder="如：BO1 / BO3">
-        </div>
+        <div class="form-group"><label>赛制说明</label><input id="matchNote" type="text" placeholder="如：BO1 / BO3"></div>
       </div>
       <button class="btn blue" onclick="createMatch()">创建比赛</button>
 
@@ -831,14 +533,8 @@
         <h3>比赛结果与选手数据录入</h3>
         <p id="editingMatchTitle"></p>
         <div class="row-4">
-          <div class="form-group">
-            <label>战队A比分</label>
-            <input id="editScoreA" type="number" min="0" placeholder="请输入比分">
-          </div>
-          <div class="form-group">
-            <label>战队B比分</label>
-            <input id="editScoreB" type="number" min="0" placeholder="请输入比分">
-          </div>
+          <div class="form-group"><label>战队A比分</label><input id="editScoreA" type="number" min="0"></div>
+          <div class="form-group"><label>战队B比分</label><input id="editScoreB" type="number" min="0"></div>
           <div class="form-group">
             <label>比赛状态</label>
             <select id="editMatchStatus">
@@ -847,14 +543,9 @@
               <option value="已结束">已结束</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>获胜方</label>
-            <select id="editWinner"></select>
-          </div>
+          <div class="form-group"><label>获胜方</label><select id="editWinner"></select></div>
         </div>
-
         <div id="playerScoreEditor"></div>
-
         <button class="btn" onclick="saveMatchResult()">保存比赛结果与数据</button>
         <button class="btn gray" onclick="closeMatchEditor()">关闭编辑</button>
       </div>
@@ -862,14 +553,8 @@
       <div class="divider"></div>
 
       <div class="title-line"><h3>发布公告</h3></div>
-      <div class="form-group">
-        <label>公告标题</label>
-        <input id="announcementTitle" type="text" placeholder="请输入公告标题">
-      </div>
-      <div class="form-group">
-        <label>公告内容</label>
-        <textarea id="announcementContent" placeholder="请输入公告内容，例如比赛时间、对手、签到要求、赛程调整等"></textarea>
-      </div>
+      <div class="form-group"><label>公告标题</label><input id="announcementTitle" type="text" placeholder="请输入公告标题"></div>
+      <div class="form-group"><label>公告内容</label><textarea id="announcementContent" placeholder="请输入公告内容"></textarea></div>
       <button class="btn" onclick="publishAnnouncement()">发布公告</button>
 
       <h3 style="margin-top:20px;">公告管理</h3>
@@ -900,22 +585,18 @@
           <button class="btn blue" onclick="saveSignupLink()">保存报名链接并生成二维码</button>
         </div>
       </div>
-
-      <div class="divider"></div>
-
-      <div class="title-line"><h3>系统工具</h3></div>
-      <button class="btn blue" onclick="exportData()">导出本地数据</button>
-      <button class="btn gray" onclick="resetAllData()">清空全部数据</button>
-      <p class="small">导出后会下载一个JSON文件，便于备份报名、赛程、比赛数据和公告。</p>
     </div>
   </section>
 </div>
 
-<div class="footer">
-  王者比赛报名与赛事管理系统 · 电竞正式版单文件网页
-</div>
+<div class="footer">王者比赛报名与赛事管理系统 · Supabase 云端最终版</div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  const SUPABASE_URL = 'https://ngovujnafjeyzcppqpds.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_Ct3DhfDfImn9RJgM01t5KQ_4UlDD9OE';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   let currentEditingMatchId = null;
 
   function showSection(id) {
@@ -925,29 +606,117 @@
     renderAllPublic();
   }
 
-  function getData(key) {
-    return JSON.parse(localStorage.getItem(key) || '[]');
-  }
-  function setData(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
-  }
-
-  function getPlayers() { return getData('players'); }
-  function setPlayers(data) { setData('players', data); }
-  function getMatches() { return getData('matches'); }
-  function setMatches(data) { setData('matches', data); }
-  function getAnnouncements() { return getData('announcements'); }
-  function setAnnouncements(data) { setData('announcements', data); }
-  function getSignupLink() { return localStorage.getItem('signupLink') || ''; }
-  function setSignupLink(link) { localStorage.setItem('signupLink', link); }
-
   function escapeHtml(str='') {
-    return str.replace(/[&<>"']/g, s => ({
+    return String(str).replace(/[&<>"']/g, s => ({
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
     }[s]));
   }
 
-  function submitSignup() {
+  function getSignupLink() { return localStorage.getItem('signupLink') || ''; }
+  function setSignupLink(link) { localStorage.setItem('signupLink', link); }
+
+  function resetForm() {
+    document.getElementById('name').value = '';
+    document.getElementById('contact').value = '';
+    document.getElementById('team').value = '';
+    document.getElementById('identity').value = '';
+    document.getElementById('gameid').value = '';
+    document.getElementById('platform').value = '';
+    document.getElementById('remark').value = '';
+    document.querySelectorAll('.lane').forEach(i => i.checked = false);
+  }
+
+  async function fetchTeams() {
+    const { data, error } = await supabaseClient.from('teams').select('*').order('id', { ascending: true });
+    if (error) { console.error('读取战队失败：', error); return []; }
+    return data || [];
+  }
+async function cleanupEmptyTeam(teamId) {
+  if (!teamId) return;
+
+  try {
+    const { data: remainPlayers, error: remainError } = await supabaseClient
+      .from('players')
+      .select('id')
+      .eq('team_id', teamId);
+
+    if (remainError) {
+      console.error('检查空战队失败：', remainError);
+      return;
+    }
+
+    if (!remainPlayers || remainPlayers.length === 0) {
+      const { error: deleteTeamError } = await supabaseClient
+        .from('teams')
+        .delete()
+        .eq('id', teamId);
+
+      if (deleteTeamError) {
+        console.error('删除空战队失败：', deleteTeamError);
+      } else {
+        console.log('已自动删除空战队，teamId =', teamId);
+      }
+    }
+  } catch (err) {
+    console.error('清理空战队异常：', err);
+  }
+}
+
+
+  async function fetchPlayers() {
+    const { data: playersData, error: playersError } = await supabaseClient
+      .from('players').select('*').order('id', { ascending: false });
+    if (playersError) { console.error('读取选手失败：', playersError); return []; }
+
+    const teams = await fetchTeams();
+
+    return (playersData || []).map(item => {
+      const team = teams.find(t => t.id === item.team_id);
+      return {
+        id: item.id,
+        name: item.name,
+        contact: item.contact,
+        team: team ? team.team_name : '',
+        teamId: item.team_id,
+        identity: item.identity_type,
+        gameid: item.game_id,
+        platform: item.platform,
+        lanes: item.lanes ? item.lanes.split(',') : [],
+        remark: item.remark || ''
+      };
+    });
+  }
+
+  async function fetchMatches() {
+    const { data, error } = await supabaseClient
+      .from('matches')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (error) { console.error('读取比赛失败：', error); return []; }
+    return data || [];
+  }
+
+  async function fetchAnnouncements() {
+    const { data, error } = await supabaseClient
+      .from('announcements')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (error) { console.error('读取公告失败：', error); return []; }
+    return data || [];
+  }
+
+  async function fetchPlayerMatchStats() {
+    const { data, error } = await supabaseClient
+      .from('player_match_stats')
+      .select('*');
+
+    if (error) { console.error('读取比赛数据失败：', error); return []; }
+    return data || [];
+  }
+
+  async function submitSignup() {
     const name = document.getElementById('name').value.trim();
     const contact = document.getElementById('contact').value.trim();
     const team = document.getElementById('team').value.trim();
@@ -962,26 +731,68 @@
       return;
     }
 
-    const players = getPlayers();
-    players.push({
-      id: Date.now(),
-      name, contact, team, identity, gameid, platform, remark, lanes
-    });
-    setPlayers(players);
-    alert('报名成功！');
-    resetForm();
-    renderAll();
-  }
+    try {
+      const { data: existedPlayers, error: existedError } = await supabaseClient
+        .from('players')
+        .select('id')
+        .eq('name', name)
+        .eq('game_id', gameid);
 
-  function resetForm() {
-    document.getElementById('name').value = '';
-    document.getElementById('contact').value = '';
-    document.getElementById('team').value = '';
-    document.getElementById('identity').value = '';
-    document.getElementById('gameid').value = '';
-    document.getElementById('platform').value = '';
-    document.getElementById('remark').value = '';
-    document.querySelectorAll('.lane').forEach(i => i.checked = false);
+      if (existedError) throw existedError;
+      if (existedPlayers && existedPlayers.length > 0) {
+        alert('该选手已报名，昵称和游戏ID重复，请勿重复提交。');
+        return;
+      }
+
+      let { data: teamRows, error: teamError } = await supabaseClient
+        .from('teams')
+        .select('*')
+        .eq('team_name', team);
+
+      if (teamError) throw teamError;
+
+      let teamId;
+      if (!teamRows || teamRows.length === 0) {
+        const { data: newTeam, error: newTeamError } = await supabaseClient
+          .from('teams')
+          .insert([{ team_name: team }])
+          .select();
+        if (newTeamError) throw newTeamError;
+        teamId = newTeam[0].id;
+      } else {
+        teamId = teamRows[0].id;
+      }
+
+      const { data: playerData, error: playerError } = await supabaseClient
+        .from('players')
+        .insert([{
+          name, contact, team_id: teamId,
+          identity_type: identity, game_id: gameid,
+          platform, lanes: lanes.join(','), remark
+        }])
+        .select();
+
+      if (playerError) throw playerError;
+
+      if (identity === '队长') {
+        const { error: updateTeamError } = await supabaseClient
+          .from('teams')
+          .update({
+            captain_player_id: playerData[0].id,
+            contact_phone: contact
+          })
+          .eq('id', teamId);
+
+        if (updateTeamError) throw updateTeamError;
+      }
+
+      alert('报名成功！数据已保存到云端。');
+      resetForm();
+      await renderAll();
+    } catch (err) {
+      console.error(err);
+      alert('报名失败：' + (err.message || '请稍后重试'));
+    }
   }
 
   function adminLogin() {
@@ -1004,31 +815,21 @@
     return teams;
   }
 
-  function getTeamCaptain(teamName) {
-    const players = getPlayers().filter(p => p.team === teamName);
-    return players.find(p => p.identity === '队长') || null;
-  }
-
-  function getTeamMembers(teamName) {
-    return getPlayers().filter(p => p.team === teamName);
-  }
-
-  function renderPlayerFilterOptions() {
-    const players = getPlayers();
-    const teams = Object.keys(groupTeams(players));
+  function renderPlayerFilterOptions(players) {
+    const teams = [...new Set(players.map(p => p.team).filter(Boolean))];
     const el = document.getElementById('playerFilterTeam');
     if (!el) return;
     const current = el.value;
-    el.innerHTML = '<option value="">全部战队</option>' + teams.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+    el.innerHTML = '<option value="">全部战队</option>' + teams.map(t => `<option value="${t}">${t}</option>`).join('');
     if (teams.includes(current)) el.value = current;
   }
 
-  function renderAdminPlayers() {
-    const players = getPlayers();
+  async function renderAdminPlayers() {
+    const players = await fetchPlayers();
     const body = document.getElementById('adminPlayersBody');
     if (!body) return;
 
-    renderPlayerFilterOptions();
+    renderPlayerFilterOptions(players);
 
     const kw = (document.getElementById('playerSearch')?.value || '').trim().toLowerCase();
     const teamFilter = document.getElementById('playerFilterTeam')?.value || '';
@@ -1064,59 +865,115 @@
     `).join('');
   }
 
-  function editPlayer(id) {
-    const p = getPlayers().find(x => x.id === id);
-    if (!p) return;
-    document.getElementById('playerEditor').style.display = 'block';
-    document.getElementById('editPlayerId').value = p.id;
-    document.getElementById('editPlayerName').value = p.name;
-    document.getElementById('editPlayerContact').value = p.contact;
-    document.getElementById('editPlayerTeam').value = p.team;
-    document.getElementById('editPlayerIdentity').value = p.identity;
-    document.getElementById('editPlayerGameId').value = p.gameid;
-    document.getElementById('editPlayerPlatform').value = p.platform;
-    document.getElementById('editPlayerLanes').value = p.lanes.join('、');
-    document.getElementById('editPlayerRemark').value = p.remark || '';
+  async function deletePlayer(id) {
+  if (!confirm('确定删除该选手吗？')) return;
+
+  try {
+    const { data: beforeRows, error: beforeError } = await supabaseClient
+      .from('players')
+      .select('*')
+      .eq('id', id);
+
+    if (beforeError) {
+      alert('删除前查询失败：' + (beforeError.message || '请稍后重试'));
+      return;
+    }
+
+    if (!beforeRows || beforeRows.length === 0) {
+      alert('未找到要删除的记录，可能已经被删除。');
+      return;
+    }
+
+    const targetPlayer = beforeRows[0];
+    const oldTeamId = targetPlayer.team_id;
+
+    const { error: deleteError } = await supabaseClient
+      .from('players')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) {
+      alert('删除失败：' + (deleteError.message || '没有权限或服务器异常'));
+      return;
+    }
+
+    await cleanupEmptyTeam(oldTeamId);
+
+    alert('删除成功：' + (targetPlayer.name || '该选手') + '，游戏ID：' + (targetPlayer.game_id || '-'));
+    await renderAll();
+  } catch (err) {
+    console.error(err);
+    alert('删除失败：' + (err.message || '请稍后重试'));
   }
+}
 
-  function savePlayerEdit() {
-    const id = Number(document.getElementById('editPlayerId').value);
-    let players = getPlayers();
-    const idx = players.findIndex(x => x.id === id);
-    if (idx === -1) return;
 
-    players[idx] = {
-      ...players[idx],
-      name: document.getElementById('editPlayerName').value.trim(),
-      contact: document.getElementById('editPlayerContact').value.trim(),
-      team: document.getElementById('editPlayerTeam').value.trim(),
-      identity: document.getElementById('editPlayerIdentity').value,
-      gameid: document.getElementById('editPlayerGameId').value.trim(),
-      platform: document.getElementById('editPlayerPlatform').value,
-      lanes: document.getElementById('editPlayerLanes').value.split(/[、,，\s]+/).filter(Boolean),
-      remark: document.getElementById('editPlayerRemark').value.trim()
-    };
 
-    setPlayers(players);
-    alert('选手信息已更新。');
-    closePlayerEditor();
-    renderAll();
-  }
 
   function closePlayerEditor() {
     document.getElementById('playerEditor').style.display = 'none';
   }
 
-  function deletePlayer(id) {
-    if (!confirm('确定删除该选手吗？')) return;
-    let players = getPlayers();
-    players = players.filter(p => p.id !== id);
-    setPlayers(players);
-    renderAll();
-  }
+ async function deletePlayer(id) {
+  if (!confirm('确定删除该选手吗？')) return;
 
-  function renderTeams() {
-    const players = getPlayers();
+  try {
+    const { data: beforeRows, error: beforeError } = await supabaseClient
+      .from('players')
+      .select('*')
+      .eq('id', id);
+
+    if (beforeError) {
+      alert('删除前查询失败：' + (beforeError.message || '请稍后重试'));
+      return;
+    }
+
+    if (!beforeRows || beforeRows.length === 0) {
+      alert('未找到要删除的记录，可能已经被删除。');
+      return;
+    }
+
+    const targetPlayer = beforeRows[0];
+    const teamId = targetPlayer.team_id;
+
+    const { error: deleteError } = await supabaseClient
+      .from('players')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) {
+      alert('删除失败：' + (deleteError.message || '没有权限或服务器异常'));
+      return;
+    }
+
+    const { data: remainPlayers, error: remainError } = await supabaseClient
+      .from('players')
+      .select('id')
+      .eq('team_id', teamId);
+
+    if (!remainError && (!remainPlayers || remainPlayers.length === 0)) {
+      const { error: deleteTeamError } = await supabaseClient
+        .from('teams')
+        .delete()
+        .eq('id', teamId);
+
+      if (deleteTeamError) {
+        console.error('删除空战队失败：', deleteTeamError);
+      }
+    }
+
+    alert('删除成功：' + (targetPlayer.name || '该选手') + '，游戏ID：' + (targetPlayer.game_id || '-'));
+    await renderAll();
+  } catch (err) {
+    console.error(err);
+    alert('删除失败：' + (err.message || '请稍后重试'));
+  }
+}
+
+
+
+  async function renderTeams() {
+    const players = await fetchPlayers();
     const teamWrap = document.getElementById('teamList');
     const teamA = document.getElementById('teamASelect');
     const teamB = document.getElementById('teamBSelect');
@@ -1151,9 +1008,7 @@
           ${captain ? `<p><strong>队长：</strong>${escapeHtml(captain.name)}（${escapeHtml(captain.gameid)}） | 联系方式：${escapeHtml(captain.contact)}</p>` : `<p class="danger">该战队暂未设置队长</p>`}
           ${tooManyCaptain ? `<p class="danger">该战队存在多名队长，请调整</p>` : ''}
           <p><strong>组员：</strong></p>
-          <div>
-            ${normalMembers.length ? normalMembers.map(m => `<span class="tag">${escapeHtml(m.name)}</span>`).join('') : '暂无组员'}
-          </div>
+          <div>${normalMembers.length ? normalMembers.map(m => `<span class="tag">${escapeHtml(m.name)}</span>`).join('') : '暂无组员'}</div>
         </div>
       `;
     }).join('');
@@ -1163,53 +1018,82 @@
     if (teamB) teamB.innerHTML = options;
   }
 
-  function createMatch() {
+  async function createMatch() {
     const round = document.getElementById('matchRound').value.trim();
-    const teamA = document.getElementById('teamASelect').value;
-    const teamB = document.getElementById('teamBSelect').value;
-    const time = document.getElementById('matchTime').value.trim();
+    const teamAName = document.getElementById('teamASelect').value;
+    const teamBName = document.getElementById('teamBSelect').value;
+    const time = document.getElementById('matchTime').value;
     const status = document.getElementById('matchStatus').value;
     const note = document.getElementById('matchNote').value.trim();
 
-    if (!round || !teamA || !teamB || !time) {
+    if (!round || !teamAName || !teamBName || !time) {
       alert('请完整填写比赛信息。');
       return;
     }
-    if (teamA === teamB) {
+    if (teamAName === teamBName) {
       alert('战队A和战队B不能相同。');
       return;
     }
 
-    const matches = getMatches();
-    matches.push({
-      id: Date.now(),
-      createdAt: Date.now(),
-      round,
-      teamA,
-      teamB,
-      time,
-      status,
-      note,
-      scoreA: '',
-      scoreB: '',
-      winner: '',
-      playerScores: []
-    });
-    setMatches(matches);
-    alert('比赛创建成功。');
-    document.getElementById('matchRound').value = '';
-    document.getElementById('matchTime').value = '';
-    document.getElementById('matchStatus').value = '未开始';
-    document.getElementById('matchNote').value = '';
-    renderAll();
+    try {
+      const teams = await fetchTeams();
+      const teamA = teams.find(t => t.team_name === teamAName);
+      const teamB = teams.find(t => t.team_name === teamBName);
+
+      if (!teamA || !teamB) {
+        alert('战队数据异常，请重新选择。');
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from('matches')
+        .insert([{
+          round_name: round,
+          team_a_id: teamA.id,
+          team_b_id: teamB.id,
+          match_time: new Date(time).toISOString(),
+          match_status: status,
+          match_note: note
+        }]);
+
+      if (error) throw error;
+
+      alert('比赛创建成功。');
+      document.getElementById('matchRound').value = '';
+      document.getElementById('matchTime').value = '';
+      document.getElementById('matchStatus').value = '未开始';
+      document.getElementById('matchNote').value = '';
+      await renderAll();
+    } catch (err) {
+      console.error(err);
+      alert('创建比赛失败：' + (err.message || '请稍后重试'));
+    }
   }
 
-  function renderMatchesPublic() {
-    const matches = getMatches();
+  async function fetchMatchesView() {
+    const matches = await fetchMatches();
+    const teams = await fetchTeams();
+
+    return matches.map(m => {
+      const teamA = teams.find(t => t.id === m.team_a_id);
+      const teamB = teams.find(t => t.id === m.team_b_id);
+      const winner = teams.find(t => t.id === m.winner_team_id);
+
+      return {
+        ...m,
+        teamAName: teamA ? teamA.team_name : '-',
+        teamBName: teamB ? teamB.team_name : '-',
+        winnerName: winner ? winner.team_name : ''
+      };
+    });
+  }
+
+  async function renderMatchesPublic() {
+    const matches = await fetchMatchesView();
     const body = document.getElementById('scheduleBody');
     if (!body) return;
 
-    if (matches.length === 0) {
+    if (!matches.length) {
       body.innerHTML = '<tr><td colspan="8">暂无赛程数据</td></tr>';
       return;
     }
@@ -1217,47 +1101,48 @@
     body.innerHTML = matches.map(m => `
       <tr>
         <td>${m.id}</td>
-        <td>${escapeHtml(m.round)}</td>
-        <td>${escapeHtml(m.teamA)} vs ${escapeHtml(m.teamB)}</td>
-        <td>${escapeHtml(m.time)}</td>
-        <td>${escapeHtml(m.status)}</td>
-        <td>${escapeHtml(m.note || '-')}</td>
-        <td>${m.scoreA !== '' && m.scoreB !== '' ? `${m.scoreA} : ${m.scoreB}` : '-'}</td>
-        <td>${escapeHtml(m.winner || '-')}</td>
+        <td>${escapeHtml(m.round_name)}</td>
+        <td>${escapeHtml(m.teamAName)} vs ${escapeHtml(m.teamBName)}</td>
+        <td>${new Date(m.match_time).toLocaleString()}</td>
+        <td>${escapeHtml(m.match_status)}</td>
+        <td>${escapeHtml(m.match_note || '-')}</td>
+        <td>${m.score_a !== null && m.score_b !== null ? `${m.score_a} : ${m.score_b}` : '-'}</td>
+        <td>${escapeHtml(m.winnerName || '-')}</td>
       </tr>
     `).join('');
   }
 
-  function getSortedFilteredMatches() {
-    let matches = [...getMatches()];
+  async function getSortedFilteredMatches() {
+    let matches = await fetchMatchesView();
+
     const kw = (document.getElementById('matchSearch')?.value || '').trim().toLowerCase();
     const status = document.getElementById('matchFilterStatus')?.value || '';
     const sortType = document.getElementById('matchSortType')?.value || 'timeDesc';
 
     matches = matches.filter(m => {
-      const matchKw = !kw || [m.round, m.teamA, m.teamB].join(' ').toLowerCase().includes(kw);
-      const matchStatus = !status || m.status === status;
+      const matchKw = !kw || [m.round_name, m.teamAName, m.teamBName].join(' ').toLowerCase().includes(kw);
+      const matchStatus = !status || m.match_status === status;
       return matchKw && matchStatus;
     });
 
-    if (sortType === 'timeDesc') matches.sort((a,b) => (b.createdAt||b.id) - (a.createdAt||a.id));
-    if (sortType === 'timeAsc') matches.sort((a,b) => (a.createdAt||a.id) - (b.createdAt||b.id));
+    if (sortType === 'timeDesc') matches.sort((a,b) => b.id - a.id);
+    if (sortType === 'timeAsc') matches.sort((a,b) => a.id - b.id);
     if (sortType === 'status') {
       const order = {'未开始':1,'进行中':2,'已结束':3};
-      matches.sort((a,b) => (order[a.status]||9) - (order[b.status]||9));
+      matches.sort((a,b) => (order[a.match_status]||9) - (order[b.match_status]||9));
     }
-    if (sortType === 'round') matches.sort((a,b) => String(a.round).localeCompare(String(b.round), 'zh-CN'));
+    if (sortType === 'round') matches.sort((a,b) => String(a.round_name).localeCompare(String(b.round_name), 'zh-CN'));
 
     return matches;
   }
 
-  function renderMatchesAdmin() {
+  async function renderMatchesAdmin() {
     const body = document.getElementById('adminMatchesBody');
     if (!body) return;
 
-    const matches = getSortedFilteredMatches();
+    const matches = await getSortedFilteredMatches();
 
-    if (matches.length === 0) {
+    if (!matches.length) {
       body.innerHTML = '<tr><td colspan="9">暂无比赛数据</td></tr>';
       return;
     }
@@ -1265,13 +1150,13 @@
     body.innerHTML = matches.map(m => `
       <tr>
         <td>${m.id}</td>
-        <td>${escapeHtml(m.round)}</td>
-        <td>${escapeHtml(m.teamA)} vs ${escapeHtml(m.teamB)}</td>
-        <td>${escapeHtml(m.time)}</td>
-        <td>${escapeHtml(m.status)}</td>
-        <td>${escapeHtml(m.note || '-')}</td>
-        <td>${m.scoreA !== '' && m.scoreB !== '' ? `${m.scoreA} : ${m.scoreB}` : '-'}</td>
-        <td>${escapeHtml(m.winner || '-')}</td>
+        <td>${escapeHtml(m.round_name)}</td>
+        <td>${escapeHtml(m.teamAName)} vs ${escapeHtml(m.teamBName)}</td>
+        <td>${new Date(m.match_time).toLocaleString()}</td>
+        <td>${escapeHtml(m.match_status)}</td>
+        <td>${escapeHtml(m.match_note || '-')}</td>
+        <td>${m.score_a !== null && m.score_b !== null ? `${m.score_a} : ${m.score_b}` : '-'}</td>
+        <td>${escapeHtml(m.winnerName || '-')}</td>
         <td>
           <button class="btn secondary" onclick="editMatch(${m.id})">录入结果/数据</button>
           <button class="btn gray" onclick="deleteMatch(${m.id})">删除</button>
@@ -1280,34 +1165,40 @@
     `).join('');
   }
 
-  function deleteMatch(id) {
+  async function deleteMatch(id) {
     if (!confirm('确定删除这场比赛吗？')) return;
-    let matches = getMatches();
-    matches = matches.filter(m => m.id !== id);
-    setMatches(matches);
-    renderAll();
+    try {
+      await supabaseClient.from('player_match_stats').delete().eq('match_id', id);
+      const { error } = await supabaseClient.from('matches').delete().eq('id', id);
+      if (error) throw error;
+      await renderAll();
+    } catch (err) {
+      console.error(err);
+      alert('删除失败：' + (err.message || '请稍后重试'));
+    }
   }
 
-  function editMatch(id) {
-    const matches = getMatches();
-    const players = getPlayers();
+  async function editMatch(id) {
+    const matches = await fetchMatchesView();
+    const players = await fetchPlayers();
+    const stats = await fetchPlayerMatchStats();
     const match = matches.find(m => m.id === id);
     if (!match) return;
 
     currentEditingMatchId = id;
     document.getElementById('matchEditor').style.display = 'block';
-    document.getElementById('editingMatchTitle').innerHTML = `<strong>${escapeHtml(match.round)}</strong>：${escapeHtml(match.teamA)} vs ${escapeHtml(match.teamB)} | 时间：${escapeHtml(match.time)}`;
-    document.getElementById('editScoreA').value = match.scoreA;
-    document.getElementById('editScoreB').value = match.scoreB;
-    document.getElementById('editMatchStatus').value = match.status;
+    document.getElementById('editingMatchTitle').innerHTML = `<strong>${escapeHtml(match.round_name)}</strong>：${escapeHtml(match.teamAName)} vs ${escapeHtml(match.teamBName)} | 时间：${new Date(match.match_time).toLocaleString()}`;
+    document.getElementById('editScoreA').value = match.score_a ?? '';
+    document.getElementById('editScoreB').value = match.score_b ?? '';
+    document.getElementById('editMatchStatus').value = match.match_status;
 
     document.getElementById('editWinner').innerHTML = `
       <option value="">请选择获胜方</option>
-      <option value="${escapeHtml(match.teamA)}" ${match.winner === match.teamA ? 'selected' : ''}>${escapeHtml(match.teamA)}</option>
-      <option value="${escapeHtml(match.teamB)}" ${match.winner === match.teamB ? 'selected' : ''}>${escapeHtml(match.teamB)}</option>
+      <option value="${match.team_a_id}" ${match.winner_team_id === match.team_a_id ? 'selected' : ''}>${escapeHtml(match.teamAName)}</option>
+      <option value="${match.team_b_id}" ${match.winner_team_id === match.team_b_id ? 'selected' : ''}>${escapeHtml(match.teamBName)}</option>
     `;
 
-    const relatedPlayers = players.filter(p => p.team === match.teamA || p.team === match.teamB);
+    const relatedPlayers = players.filter(p => p.teamId === match.team_a_id || p.teamId === match.team_b_id);
 
     document.getElementById('playerScoreEditor').innerHTML = `
       <h3>选手数据录入</h3>
@@ -1327,18 +1218,18 @@
         </thead>
         <tbody>
           ${relatedPlayers.map(p => {
-            const old = (match.playerScores || []).find(s => s.playerId === p.id) || {};
+            const old = stats.find(s => s.match_id === match.id && s.player_id === p.id) || {};
             return `
               <tr>
                 <td>${escapeHtml(p.name)}</td>
                 <td>${escapeHtml(p.team)}</td>
                 <td>${escapeHtml(p.identity)}</td>
-                <td><input type="number" min="0" max="10" step="0.1" id="score_${p.id}" value="${old.score ?? ''}" placeholder="评分"></td>
-                <td><input type="number" min="0" id="kills_${p.id}" value="${old.kills ?? ''}" placeholder="击杀"></td>
-                <td><input type="number" min="0" id="deaths_${p.id}" value="${old.deaths ?? ''}" placeholder="死亡"></td>
-                <td><input type="number" min="0" id="assists_${p.id}" value="${old.assists ?? ''}" placeholder="助攻"></td>
-                <td><input type="checkbox" id="mvp_${p.id}" ${old.mvp ? 'checked' : ''}></td>
-                <td><input type="text" id="remark_${p.id}" value="${escapeHtml(old.remark ?? '')}" placeholder="如：关键开团"></td>
+                <td><input type="number" min="0" max="10" step="0.1" id="score_${p.id}" value="${old.score ?? ''}"></td>
+                <td><input type="number" min="0" id="kills_${p.id}" value="${old.kills ?? ''}"></td>
+                <td><input type="number" min="0" id="deaths_${p.id}" value="${old.deaths ?? ''}"></td>
+                <td><input type="number" min="0" id="assists_${p.id}" value="${old.assists ?? ''}"></td>
+                <td><input type="checkbox" id="mvp_${p.id}" ${old.is_mvp ? 'checked' : ''}></td>
+                <td><input type="text" id="remark_${p.id}" value="${escapeHtml(old.remark ?? '')}"></td>
               </tr>
             `;
           }).join('')}
@@ -1352,78 +1243,107 @@
     currentEditingMatchId = null;
   }
 
-  function saveMatchResult() {
+  async function saveMatchResult() {
     if (!currentEditingMatchId) return;
 
-    const matches = getMatches();
-    const players = getPlayers();
-    const matchIndex = matches.findIndex(m => m.id === currentEditingMatchId);
-    if (matchIndex === -1) return;
+    try {
+      const matches = await fetchMatches();
+      const players = await fetchPlayers();
+      const match = matches.find(m => m.id === currentEditingMatchId);
+      if (!match) return;
 
-    const match = matches[matchIndex];
-    const scoreA = document.getElementById('editScoreA').value;
-    const scoreB = document.getElementById('editScoreB').value;
-    const status = document.getElementById('editMatchStatus').value;
-    const winner = document.getElementById('editWinner').value;
+      const scoreA = Number(document.getElementById('editScoreA').value || 0);
+      const scoreB = Number(document.getElementById('editScoreB').value || 0);
+      const status = document.getElementById('editMatchStatus').value;
+      const winnerTeamId = document.getElementById('editWinner').value ? Number(document.getElementById('editWinner').value) : null;
 
-    const relatedPlayers = players.filter(p => p.team === match.teamA || p.team === match.teamB);
-    const playerScores = relatedPlayers.map(p => ({
-      playerId: p.id,
-      playerName: p.name,
-      team: p.team,
-      score: Number(document.getElementById(`score_${p.id}`).value || 0),
-      kills: Number(document.getElementById(`kills_${p.id}`).value || 0),
-      deaths: Number(document.getElementById(`deaths_${p.id}`).value || 0),
-      assists: Number(document.getElementById(`assists_${p.id}`).value || 0),
-      mvp: document.getElementById(`mvp_${p.id}`).checked,
-      remark: document.getElementById(`remark_${p.id}`).value.trim()
-    }));
+      const { error: matchUpdateError } = await supabaseClient
+        .from('matches')
+        .update({
+          score_a: scoreA,
+          score_b: scoreB,
+          match_status: status,
+          winner_team_id: winnerTeamId
+        })
+        .eq('id', currentEditingMatchId);
 
-    matches[matchIndex] = {
-      ...match,
-      scoreA,
-      scoreB,
-      status,
-      winner,
-      playerScores
-    };
+      if (matchUpdateError) throw matchUpdateError;
 
-    setMatches(matches);
-    alert('比赛结果与选手数据已保存。');
-    renderAll();
+      await supabaseClient.from('player_match_stats').delete().eq('match_id', currentEditingMatchId);
+
+      const relatedPlayers = players.filter(p => p.teamId === match.team_a_id || p.teamId === match.team_b_id);
+      const inserts = relatedPlayers.map(p => ({
+        match_id: currentEditingMatchId,
+        player_id: p.id,
+        team_id: p.teamId,
+        score: Number(document.getElementById(`score_${p.id}`).value || 0),
+        kills: Number(document.getElementById(`kills_${p.id}`).value || 0),
+        deaths: Number(document.getElementById(`deaths_${p.id}`).value || 0),
+        assists: Number(document.getElementById(`assists_${p.id}`).value || 0),
+        is_mvp: document.getElementById(`mvp_${p.id}`).checked,
+        remark: document.getElementById(`remark_${p.id}`).value.trim()
+      }));
+
+      if (inserts.length > 0) {
+        const { error: insertStatsError } = await supabaseClient
+          .from('player_match_stats')
+          .insert(inserts);
+
+        if (insertStatsError) throw insertStatsError;
+      }
+
+      alert('比赛结果与选手数据已保存。');
+      closeMatchEditor();
+      await renderAll();
+    } catch (err) {
+      console.error(err);
+      alert('保存失败：' + (err.message || '请稍后重试'));
+    }
   }
 
-  function publishAnnouncement() {
+  async function publishAnnouncement() {
     const title = document.getElementById('announcementTitle').value.trim();
     const content = document.getElementById('announcementContent').value.trim();
     if (!title || !content) {
       alert('请填写公告标题和内容。');
       return;
     }
-    const list = getAnnouncements();
-    list.unshift({
-      id: Date.now(),
-      title,
-      content,
-      time: new Date().toLocaleString()
-    });
-    setAnnouncements(list);
-    document.getElementById('announcementTitle').value = '';
-    document.getElementById('announcementContent').value = '';
-    alert('公告发布成功。');
-    renderAll();
+
+    try {
+      const { error } = await supabaseClient
+        .from('announcements')
+        .insert([{ title, content }]);
+
+      if (error) throw error;
+
+      document.getElementById('announcementTitle').value = '';
+      document.getElementById('announcementContent').value = '';
+      alert('公告发布成功。');
+      await renderAll();
+    } catch (err) {
+      console.error(err);
+      alert('发布失败：' + (err.message || '请稍后重试'));
+    }
   }
 
-  function deleteAnnouncement(id) {
+  async function deleteAnnouncement(id) {
     if (!confirm('确定删除该公告吗？')) return;
-    let list = getAnnouncements();
-    list = list.filter(a => a.id !== id);
-    setAnnouncements(list);
-    renderAll();
+    try {
+      const { error } = await supabaseClient
+        .from('announcements')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      await renderAll();
+    } catch (err) {
+      console.error(err);
+      alert('删除失败：' + (err.message || '请稍后重试'));
+    }
   }
 
-  function renderAnnouncements() {
-    const list = getAnnouncements();
+  async function renderAnnouncements() {
+    const list = await fetchAnnouncements();
     const publicWrap = document.getElementById('announcementList');
     const adminBody = document.getElementById('adminAnnouncementBody');
 
@@ -1434,7 +1354,7 @@
         publicWrap.innerHTML = list.map(a => `
           <div class="team-box">
             <h3>${escapeHtml(a.title)}</h3>
-            <p class="small">发布时间：${escapeHtml(a.time)}</p>
+            <p class="small">发布时间：${new Date(a.created_at).toLocaleString()}</p>
             <p>${escapeHtml(a.content).replace(/\n/g, '<br>')}</p>
           </div>
         `).join('');
@@ -1447,7 +1367,7 @@
       } else {
         adminBody.innerHTML = list.map(a => `
           <tr>
-            <td>${escapeHtml(a.time)}</td>
+            <td>${new Date(a.created_at).toLocaleString()}</td>
             <td>${escapeHtml(a.title)}</td>
             <td>${escapeHtml(a.content).replace(/\n/g, '<br>')}</td>
             <td><button class="btn gray" onclick="deleteAnnouncement(${a.id})">删除</button></td>
@@ -1457,117 +1377,111 @@
     }
   }
 
-  function queryPlayer() {
+  async function queryPlayer() {
     const name = document.getElementById('queryName').value.trim();
-    const players = getPlayers();
-    const matches = getMatches();
     const result = document.getElementById('queryResult');
-
     if (!name) {
       alert('请输入姓名或昵称。');
       return;
     }
 
-    const player = players.find(p => p.name === name);
-    if (!player) {
-      result.innerHTML = '<div class="notice">未查询到该选手，请确认填写的姓名/昵称是否正确。</div>';
-      return;
+    try {
+      const players = await fetchPlayers();
+      const matches = await fetchMatchesView();
+      const stats = await fetchPlayerMatchStats();
+
+      const player = players.find(p => p.name === name);
+      if (!player) {
+        result.innerHTML = '<div class="notice">未查询到该选手，请确认填写的姓名/昵称是否正确。</div>';
+        return;
+      }
+
+      const relatedMatches = matches.filter(m => m.team_a_id === player.teamId || m.team_b_id === player.teamId);
+      const myStats = stats.filter(s => s.player_id === player.id);
+
+      const totalKills = myStats.reduce((s, x) => s + Number(x.kills || 0), 0);
+      const totalDeaths = myStats.reduce((s, x) => s + Number(x.deaths || 0), 0);
+      const totalAssists = myStats.reduce((s, x) => s + Number(x.assists || 0), 0);
+      const avgScore = myStats.length ? (myStats.reduce((s, x) => s + Number(x.score || 0), 0) / myStats.length).toFixed(2) : '-';
+      const mvpCount = myStats.filter(x => x.is_mvp).length;
+
+      result.innerHTML = `
+        <div class="team-box">
+          <h3>选手信息</h3>
+          <p><strong>姓名：</strong>${escapeHtml(player.name)}</p>
+          <p><strong>战队：</strong>${escapeHtml(player.team)}</p>
+          <p><strong>身份：</strong>${escapeHtml(player.identity)}</p>
+          <p><strong>平台：</strong>${escapeHtml(player.platform)}</p>
+          <p><strong>擅长位置：</strong>${player.lanes.map(escapeHtml).join('、')}</p>
+        </div>
+
+        <div class="team-box">
+          <h3>个人数据汇总</h3>
+          <p>
+            <span class="pill">出场：${myStats.length}</span>
+            <span class="pill">总击杀：${totalKills}</span>
+            <span class="pill">总死亡：${totalDeaths}</span>
+            <span class="pill">总助攻：${totalAssists}</span>
+            <span class="pill">平均评分：${avgScore}</span>
+            <span class="pill">MVP：${mvpCount}</span>
+          </p>
+        </div>
+
+        <div class="team-box">
+          <h3>我的比赛</h3>
+          ${
+            relatedMatches.length === 0 ? '暂无比赛安排' :
+            relatedMatches.map(m => {
+              const opponent = m.team_a_id === player.teamId ? m.teamBName : m.teamAName;
+              const myScore = myStats.find(s => s.match_id === m.id);
+              return `
+                <div style="margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,.08);">
+                  <p><strong>轮次：</strong>${escapeHtml(m.round_name)}</p>
+                  <p><strong>比赛时间：</strong>${new Date(m.match_time).toLocaleString()}</p>
+                  <p><strong>对手战队：</strong>${escapeHtml(opponent)}</p>
+                  <p><strong>状态：</strong>${escapeHtml(m.match_status)}</p>
+                  <p><strong>比分：</strong>${m.score_a !== null && m.score_b !== null ? `${m.score_a} : ${m.score_b}` : '-'}</p>
+                  <p><strong>获胜方：</strong>${escapeHtml(m.winnerName || '-')}</p>
+                  <p><strong>我的评分：</strong>${myScore ? myScore.score : '-'}</p>
+                  <p><strong>K/D/A：</strong>${myScore ? `${myScore.kills}/${myScore.deaths}/${myScore.assists}` : '-'}</p>
+                  <p><strong>MVP：</strong>${myScore && myScore.is_mvp ? '是' : '否'}</p>
+                  <p><strong>备注：</strong>${myScore && myScore.remark ? escapeHtml(myScore.remark) : '-'}</p>
+                </div>
+              `;
+            }).join('')
+          }
+        </div>
+      `;
+    } catch (err) {
+      console.error(err);
+      result.innerHTML = `<div class="notice">查询失败：${escapeHtml(err.message || '请稍后重试')}</div>`;
     }
-
-    const relatedMatches = matches.filter(m => m.teamA === player.team || m.teamB === player.team);
-    const myRecords = [];
-
-    relatedMatches.forEach(m => {
-      const myScore = (m.playerScores || []).find(s => s.playerId === player.id);
-      if (myScore) myRecords.push(myScore);
-    });
-
-    const totalKills = myRecords.reduce((s, x) => s + (Number(x.kills) || 0), 0);
-    const totalDeaths = myRecords.reduce((s, x) => s + (Number(x.deaths) || 0), 0);
-    const totalAssists = myRecords.reduce((s, x) => s + (Number(x.assists) || 0), 0);
-    const avgScore = myRecords.length ? (myRecords.reduce((s, x) => s + (Number(x.score) || 0), 0) / myRecords.length).toFixed(2) : '-';
-    const mvpCount = myRecords.filter(x => x.mvp).length;
-
-    result.innerHTML = `
-      <div class="team-box">
-        <h3>选手信息</h3>
-        <p><strong>姓名：</strong>${escapeHtml(player.name)}</p>
-        <p><strong>战队：</strong>${escapeHtml(player.team)}</p>
-        <p><strong>身份：</strong>${escapeHtml(player.identity)}</p>
-        <p><strong>平台：</strong>${escapeHtml(player.platform)}</p>
-        <p><strong>擅长位置：</strong>${player.lanes.map(escapeHtml).join('、')}</p>
-      </div>
-
-      <div class="team-box">
-        <h3>个人数据汇总</h3>
-        <p>
-          <span class="pill">出场：${myRecords.length}</span>
-          <span class="pill">总击杀：${totalKills}</span>
-          <span class="pill">总死亡：${totalDeaths}</span>
-          <span class="pill">总助攻：${totalAssists}</span>
-          <span class="pill">平均评分：${avgScore}</span>
-          <span class="pill">MVP：${mvpCount}</span>
-        </p>
-      </div>
-
-      <div class="team-box">
-        <h3>我的比赛</h3>
-        ${
-          relatedMatches.length === 0 ? '暂无比赛安排' :
-          relatedMatches.map(m => {
-            const opponent = m.teamA === player.team ? m.teamB : m.teamA;
-            const opponentCaptain = getTeamCaptain(opponent);
-            const opponentMembers = getTeamMembers(opponent);
-            const myScore = (m.playerScores || []).find(s => s.playerId === player.id);
-
-            return `
-              <div style="margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,.08);">
-                <p><strong>轮次：</strong>${escapeHtml(m.round)}</p>
-                <p><strong>比赛时间：</strong>${escapeHtml(m.time)}</p>
-                <p><strong>对手战队：</strong>${escapeHtml(opponent)}</p>
-                <p><strong>对手队长：</strong>${opponentCaptain ? escapeHtml(opponentCaptain.name) : '-'}</p>
-                <p><strong>对手联系方式：</strong>${opponentCaptain ? escapeHtml(opponentCaptain.contact) : '-'}</p>
-                <p><strong>对手队员：</strong>${opponentMembers.length ? opponentMembers.map(x => escapeHtml(x.name)).join('、') : '-'}</p>
-                <p><strong>状态：</strong>${escapeHtml(m.status)}</p>
-                <p><strong>比分：</strong>${m.scoreA !== '' && m.scoreB !== '' ? `${m.scoreA} : ${m.scoreB}` : '-'}</p>
-                <p><strong>获胜方：</strong>${escapeHtml(m.winner || '-')}</p>
-                <p><strong>我的评分：</strong>${myScore ? myScore.score : '-'}</p>
-                <p><strong>K/D/A：</strong>${myScore ? `${myScore.kills}/${myScore.deaths}/${myScore.assists}` : '-'}</p>
-                <p><strong>MVP：</strong>${myScore && myScore.mvp ? '是' : '否'}</p>
-                <p><strong>备注：</strong>${myScore && myScore.remark ? escapeHtml(myScore.remark) : '-'}</p>
-              </div>
-            `;
-          }).join('')
-        }
-      </div>
-    `;
   }
 
-  function calcTeamStats() {
-    const players = getPlayers();
-    const teams = Object.keys(groupTeams(players));
-    const matches = getMatches().filter(m => m.status === '已结束');
+  async function calcTeamStats() {
+    const teams = await fetchTeams();
+    const matches = (await fetchMatches()).filter(m => m.match_status === '已结束');
 
     let data = teams.map(team => {
       let played = 0, win = 0, lose = 0, points = 0, diff = 0;
       matches.forEach(m => {
-        if (m.teamA === team || m.teamB === team) {
+        if (m.team_a_id === team.id || m.team_b_id === team.id) {
           played++;
-          const a = Number(m.scoreA || 0);
-          const b = Number(m.scoreB || 0);
-          if (m.teamA === team) diff += (a - b);
-          if (m.teamB === team) diff += (b - a);
-
-          if (m.winner === team) {
+          const a = Number(m.score_a || 0);
+          const b = Number(m.score_b || 0);
+          if (m.team_a_id === team.id) diff += (a - b);
+          if (m.team_b_id === team.id) diff += (b - a);
+          if (m.winner_team_id === team.id) {
             win++;
             points += 3;
-          } else if (m.winner) {
+          } else if (m.winner_team_id) {
             lose++;
           }
         }
       });
       return {
-        team, played, win, lose, points, diff,
+        team: team.team_name,
+        played, win, lose, points, diff,
         rateValue: played ? (win / played) : 0,
         rate: played ? ((win / played) * 100).toFixed(1) + '%' : '0%'
       };
@@ -1581,11 +1495,11 @@
     return data;
   }
 
-  function calcPlayerStats() {
-    const players = getPlayers();
-    const matches = getMatches();
-    const map = {};
+  async function calcPlayerStats() {
+    const players = await fetchPlayers();
+    const stats = await fetchPlayerMatchStats();
 
+    const map = {};
     players.forEach(p => {
       map[p.id] = {
         playerId: p.id,
@@ -1601,17 +1515,15 @@
       };
     });
 
-    matches.forEach(m => {
-      (m.playerScores || []).forEach(s => {
-        if (!map[s.playerId]) return;
-        map[s.playerId].appearances += 1;
-        map[s.playerId].kills += Number(s.kills || 0);
-        map[s.playerId].deaths += Number(s.deaths || 0);
-        map[s.playerId].assists += Number(s.assists || 0);
-        map[s.playerId].scoreTotal += Number(s.score || 0);
-        map[s.playerId].scoreCount += 1;
-        if (s.mvp) map[s.playerId].mvp += 1;
-      });
+    stats.forEach(s => {
+      if (!map[s.player_id]) return;
+      map[s.player_id].appearances += 1;
+      map[s.player_id].kills += Number(s.kills || 0);
+      map[s.player_id].deaths += Number(s.deaths || 0);
+      map[s.player_id].assists += Number(s.assists || 0);
+      map[s.player_id].scoreTotal += Number(s.score || 0);
+      map[s.player_id].scoreCount += 1;
+      if (s.is_mvp) map[s.player_id].mvp += 1;
     });
 
     let data = Object.values(map).map(x => ({
@@ -1629,26 +1541,25 @@
     return data;
   }
 
-  function renderStats() {
-    const players = getPlayers();
-    const teams = Object.keys(groupTeams(players));
-    const matches = getMatches();
-    const announcements = getAnnouncements();
+  async function renderStats() {
+    const players = await fetchPlayers();
+    const teams = await fetchTeams();
+    const matches = await fetchMatches();
+    const announcements = await fetchAnnouncements();
 
     const sp = document.getElementById('statPlayers');
     const st = document.getElementById('statTeams');
     const sm = document.getElementById('statMatches');
     const sa = document.getElementById('statAnnouncements');
+    const hp = document.getElementById('homePlayers');
+    const ht = document.getElementById('homeTeams');
+    const hm = document.getElementById('homeMatches');
+    const ha = document.getElementById('homeAnnouncements');
 
     if (sp) sp.textContent = players.length;
     if (st) st.textContent = teams.length;
     if (sm) sm.textContent = matches.length;
     if (sa) sa.textContent = announcements.length;
-
-    const hp = document.getElementById('homePlayers');
-    const ht = document.getElementById('homeTeams');
-    const hm = document.getElementById('homeMatches');
-    const ha = document.getElementById('homeAnnouncements');
     if (hp) hp.textContent = players.length;
     if (ht) ht.textContent = teams.length;
     if (hm) hm.textContent = matches.length;
@@ -1656,9 +1567,8 @@
 
     const teamBody = document.getElementById('teamStatsBody');
     const playerBody = document.getElementById('playerStatsBody');
-
-    const teamStats = calcTeamStats();
-    const playerStats = calcPlayerStats();
+    const teamStats = await calcTeamStats();
+    const playerStats = await calcPlayerStats();
 
     if (teamBody) {
       if (!teamStats.length) {
@@ -1745,48 +1655,20 @@
     else if (img) img.src = '';
   }
 
-  function exportData() {
-    const data = {
-      players: getPlayers(),
-      matches: getMatches(),
-      announcements: getAnnouncements(),
-      signupLink: getSignupLink(),
-      exportTime: new Date().toLocaleString()
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json;charset=utf-8'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = '王者比赛管理数据备份.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  function resetAllData() {
-    if (!confirm('确定清空全部本地数据吗？该操作不可恢复。')) return;
-    localStorage.removeItem('players');
-    localStorage.removeItem('matches');
-    localStorage.removeItem('announcements');
-    localStorage.removeItem('signupLink');
-    alert('已清空全部数据。');
-    renderAll();
-    document.getElementById('queryResult').innerHTML = '';
+  async function renderAllPublic() {
+    await renderMatchesPublic();
+    await renderAnnouncements();
+    await renderStats();
     loadSignupQR();
   }
 
-  function renderAllPublic() {
-    renderMatchesPublic();
-    renderAnnouncements();
-    renderStats();
-    loadSignupQR();
-  }
-
-  function renderAll() {
-    renderAdminPlayers();
-    renderTeams();
-    renderMatchesPublic();
-    renderMatchesAdmin();
-    renderAnnouncements();
-    renderStats();
+  async function renderAll() {
+    await renderAdminPlayers();
+    await renderTeams();
+    await renderMatchesPublic();
+    await renderMatchesAdmin();
+    await renderAnnouncements();
+    await renderStats();
     loadSignupQR();
   }
 
@@ -1800,7 +1682,151 @@
   }
 
   initHash();
-  renderAll();
+  renderAll().catch(console.error);
+
+async function cleanupEmptyTeam(teamId) {
+  if (!teamId) return;
+
+  try {
+    const { data: remainPlayers, error: remainError } = await supabaseClient
+      .from('players')
+      .select('id')
+      .eq('team_id', teamId);
+
+    if (remainError) {
+      console.error('检查空战队失败：', remainError);
+      return;
+    }
+
+    if (!remainPlayers || remainPlayers.length === 0) {
+      const { error: deleteTeamError } = await supabaseClient
+        .from('teams')
+        .delete()
+        .eq('id', teamId);
+
+      if (deleteTeamError) {
+        console.error('删除空战队失败：', deleteTeamError);
+      } else {
+        console.log('已自动删除空战队，teamId =', teamId);
+      }
+    }
+  } catch (err) {
+    console.error('清理空战队异常：', err);
+  }
+}
+
+async function editPlayer(id) {
+  const players = await fetchPlayers();
+  const p = players.find(x => x.id === id);
+  if (!p) {
+    alert('未找到该选手数据');
+    return;
+  }
+
+  document.getElementById('playerEditor').style.display = 'block';
+  document.getElementById('editPlayerId').value = p.id;
+  document.getElementById('editPlayerName').value = p.name;
+  document.getElementById('editPlayerContact').value = p.contact;
+  document.getElementById('editPlayerTeam').value = p.team;
+  document.getElementById('editPlayerIdentity').value = p.identity;
+  document.getElementById('editPlayerGameId').value = p.gameid;
+  document.getElementById('editPlayerPlatform').value = p.platform;
+  document.getElementById('editPlayerLanes').value = p.lanes.join('、');
+  document.getElementById('editPlayerRemark').value = p.remark || '';
+}
+
+async function savePlayerEdit() {
+  const id = Number(document.getElementById('editPlayerId').value);
+  const name = document.getElementById('editPlayerName').value.trim();
+  const contact = document.getElementById('editPlayerContact').value.trim();
+  const teamName = document.getElementById('editPlayerTeam').value.trim();
+  const identity = document.getElementById('editPlayerIdentity').value;
+  const gameid = document.getElementById('editPlayerGameId').value.trim();
+  const platform = document.getElementById('editPlayerPlatform').value;
+  const lanes = document.getElementById('editPlayerLanes').value.split(/[、,，\s]+/).filter(Boolean);
+  const remark = document.getElementById('editPlayerRemark').value.trim();
+
+  if (!name || !contact || !teamName || !identity || !gameid || !platform || lanes.length === 0) {
+    alert('请完整填写选手信息。');
+    return;
+  }
+
+  try {
+    const { data: oldPlayerRows, error: oldPlayerError } = await supabaseClient
+      .from('players')
+      .select('*')
+      .eq('id', id);
+
+    if (oldPlayerError) throw oldPlayerError;
+    if (!oldPlayerRows || oldPlayerRows.length === 0) {
+      alert('未找到该选手原始数据。');
+      return;
+    }
+
+    const oldPlayer = oldPlayerRows[0];
+    const oldTeamId = oldPlayer.team_id;
+
+    let { data: teamRows, error: teamError } = await supabaseClient
+      .from('teams')
+      .select('*')
+      .eq('team_name', teamName);
+
+    if (teamError) throw teamError;
+
+    let newTeamId;
+    if (!teamRows || teamRows.length === 0) {
+      const { data: newTeam, error: newTeamError } = await supabaseClient
+        .from('teams')
+        .insert([{ team_name: teamName }])
+        .select();
+
+      if (newTeamError) throw newTeamError;
+      newTeamId = newTeam[0].id;
+    } else {
+      newTeamId = teamRows[0].id;
+    }
+
+    const { error: playerUpdateError } = await supabaseClient
+      .from('players')
+      .update({
+        name,
+        contact,
+        team_id: newTeamId,
+        identity_type: identity,
+        game_id: gameid,
+        platform,
+        lanes: lanes.join(','),
+        remark
+      })
+      .eq('id', id);
+
+    if (playerUpdateError) throw playerUpdateError;
+
+    if (identity === '队长') {
+      const { error: teamUpdateError } = await supabaseClient
+        .from('teams')
+        .update({
+          captain_player_id: id,
+          contact_phone: contact
+        })
+        .eq('id', newTeamId);
+
+      if (teamUpdateError) throw teamUpdateError;
+    }
+
+    if (oldTeamId !== newTeamId) {
+      await cleanupEmptyTeam(oldTeamId);
+    }
+
+    alert('选手信息已更新。');
+    closePlayerEditor();
+    await renderAll();
+  } catch (err) {
+    console.error(err);
+    alert('保存失败：' + (err.message || '请稍后重试'));
+  }
+}
+
 </script>
 </body>
 </html>
