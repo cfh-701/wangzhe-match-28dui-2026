@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>王者比赛报名与赛事管理系统 - 电竞正式版</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root{
+      --bg1:#060912;
+      --bg2:#0b1220;
+      --bg3:#111827;
+      --cyan:#22d3ee;
+      --blue:#3b82f6;
+      --purple:#8b5cf6;
+      --red:#ef4444;
+      --pink:#ec4899;
+      --yellow:#fbbf24;
+      --green:#10b981;
+      --white:#f8fafc;
+      --text:#dbeafe;
+      --muted:#94a3b8;
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.04);
+      --border:rgba(255,255,255,.10);
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+
+    body{
+      margin:0;
+      color:var(--text);
+      font-family:"Microsoft YaHei",Arial,sans-serif;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(34,211,238,.12), transparent 22%),
+        radial-gradient(circle at 90% 10%, rgba(239,68,68,.12), transparent 22%),
+        radial-gradient(circle at 50% 80%, rgba(139,92,246,.12), transparent 28%),
+        linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+      min-height:100vh;
+    }
+
+    .grid-overlay{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity:.35;
+      z-index:0;
+    }
+
+    header{
+      position:relative;
+      z-index:1;
+      text-align:center;
+      padding:32px 16px 24px;
+      background:linear-gradient(90deg, rgba(34,211,238,.08), rgba(139,92,246,.08), rgba(239,68,68,.08));
+      border-bottom:1px solid rgba(255,255,255,.08);
+      box-shadow:0 8px 30px rgba(0,0,0,.25);
+    }
+
+    header h1{
+      margin:0;
+      font-size:34px;
+      color:#fff;
+      letter-spacing:2px;
+      text-shadow:0 0 20px rgba(34,211,238,.3), 0 0 20px rgba(239,68,68,.15);
+    }
+
+    header p{
+      margin:10px 0 0;
+      color:#cbd5e1;
+      font-size:14px;
+    }
+
+    .hero-pill{
+      display:inline-block;
+      margin-top:14px;
+      padding:8px 16px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:#e0f2fe;
+      font-size:13px;
+      box-shadow:0 0 16px rgba(34,211,238,.08);
+    }
+
+    nav{
+      position:sticky;
+      top:0;
+      z-index:10;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:10px;
+      padding:14px;
+      background:rgba(5,10,20,.78);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+
+    nav button{
+      border:none;
+      color:#fff;
+      cursor:pointer;
+      padding:10px 18px;
+      font-size:14px;
+      border-radius:12px;
+      background:linear-gradient(90deg, rgba(59,130,246,.95), rgba(139,92,246,.95));
+      box-shadow:0 0 14px rgba(59,130,246,.2);
+      transition:.2s ease;
+    }
+
+    nav button:hover{
+      transform:translateY(-1px);
+      box-shadow:0 0 20px rgba(139,92,246,.28);
+    }
+
+    .container{
+      position:relative;
+      z-index:1;
+      max-width:1400px;
+      margin:24px auto;
+      padding:0 16px 40px;
+    }
+
+    .card{
+      display:none;
+      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:22px;
+      margin-bottom:18px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+    }
+
+    .card.active{ display:block; }
+
+    .title-line{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .title-line::before{
+      content:"";
+      width:6px;
+      height:24px;
+      border-radius:10px;
+      background:linear-gradient(180deg, var(--cyan), var(--pink));
+      box-shadow:0 0 12px rgba(34,211,238,.45);
+    }
+
+    h2,h3{
+      margin:0;
+      color:#fff;
+    }
+
+    .notice{
+      background:linear-gradient(90deg, rgba(251,191,36,.12), rgba(239,68,68,.08));
+      border-left:4px solid var(--yellow);
+      padding:12px 14px;
+      border-radius:10px;
+      margin-bottom:16px;
+      line-height:1.75;
+      color:#fff7d6;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .row-3{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:14px;
+    }
+
+    .row-4{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr 1fr;
+      gap:14px;
+    }
+
+    .form-group{
+      margin-bottom:14px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:8px;
+      color:#dbeafe;
+      font-weight:700;
+      font-size:14px;
+    }
+
+    input,select,textarea{
+      width:100%;
+      padding:11px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      outline:none;
+      font-size:14px;
+      background:rgba(255,255,255,.95);
+      color:#111827;
+    }
+
+    textarea{
+      min-height:90px;
+      resize:vertical;
+    }
+
+    .checkbox-group{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+      gap:8px;
+    }
+
+    .checkbox-group label{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:10px;
+      border-radius:10px;
+      background:rgba(255,255,255,.06);
+      font-weight:400;
+      color:#e2e8f0;
+    }
+
+    .checkbox-group input{ width:auto; }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      color:#fff;
+      padding:10px 16px;
+      border-radius:12px;
+      font-size:14px;
+      margin-right:8px;
+      margin-top:6px;
+      background:linear-gradient(90deg, #f59e0b, #ef4444);
+      box-shadow:0 0 16px rgba(239,68,68,.16);
+    }
+
+    .btn.secondary{
+      background:linear-gradient(90deg, #10b981, #06b6d4);
+      box-shadow:0 0 16px rgba(16,185,129,.16);
+    }
+
+    .btn.blue{
+      background:linear-gradient(90deg, #3b82f6, #8b5cf6);
+    }
+
+    .btn.gray{
+      background:linear-gradient(90deg, #64748b, #475569);
+    }
+
+    .toolbar{
+      display:grid;
+      grid-template-columns:2fr 1fr 1fr 1fr;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .panel{
+      background:rgba(255,255,255,.045);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+    }
+
+    .stat-card{
+      background:linear-gradient(135deg, rgba(34,211,238,.08), rgba(139,92,246,.06), rgba(239,68,68,.06));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 0 18px rgba(34,211,238,.05);
+    }
+
+    .stat-card h3{
+      font-size:14px;
+      color:#cbd5e1;
+      margin-bottom:8px;
+    }
+
+    .stat-card p{
+      margin:0;
+      font-size:28px;
+      font-weight:700;
+      color:#fff;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:12px;
+      background:rgba(255,255,255,.03);
+      border-radius:12px;
+      overflow:hidden;
+    }
+
+    th,td{
+      padding:10px;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      text-align:left;
+      font-size:14px;
+      vertical-align:top;
+    }
+
+    th{
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    tr:hover td{
+      background:rgba(255,255,255,.025);
+    }
+
+    .tag{
+      display:inline-block;
+      padding:4px 8px;
+      margin:2px 6px 2px 0;
+      border-radius:999px;
+      font-size:12px;
+      background:rgba(59,130,246,.18);
+      color:#dbeafe;
+      border:1px solid rgba(59,130,246,.18);
+    }
+
+    .pill{
+      display:inline-block;
+      padding:5px 10px;
+      margin:4px 8px 0 0;
+      border-radius:999px;
+      font-size:12px;
+      color:#fff;
+      background:rgba(16,185,129,.18);
+      border:1px solid rgba(16,185,129,.18);
+    }
+
+    .team-box{
+      background:rgba(255,255,255,.045);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:12px;
+    }
+
+    .divider{
+      height:1px;
+      background:rgba(255,255,255,.08);
+      margin:20px 0;
+    }
+
+    .small{ color:var(--muted); font-size:13px; }
+    .danger{ color:#fecaca; }
+    .success{ color:#bbf7d0; }
+    .warning{ color:#fde68a; }
+
+    .qr-box{
+      display:grid;
+      grid-template-columns:220px 1fr;
+      gap:18px;
+      align-items:center;
+      background:rgba(255,255,255,.045);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      padding:16px;
+    }
+
+    .qr-img-wrap{
+      background:#fff;
+      border-radius:12px;
+      padding:12px;
+      text-align:center;
+      min-height:220px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .qr-img-wrap img{
+      max-width:100%;
+      display:block;
+    }
+
+    .footer{
+      text-align:center;
+      color:#94a3b8;
+      padding:24px 12px 36px;
+      font-size:14px;
+    }
+
+    @media (max-width: 1100px){
+      .row,.row-3,.row-4,.toolbar,.stat-grid,.qr-box{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="grid-overlay"></div>
+
+<header>
+  <h1>王者比赛报名与赛事管理系统</h1>
+  <p>五一劳动节 · 5v5峡谷征召比赛 · 28队组织内赛事</p>
+  <div class="hero-pill">电竞科技风UI · 报名 / 赛程 / 数据 / 公告 / 后台管理一体化</div>
+</header>
+
+<nav>
+  <button onclick="showSection('home')">首页</button>
+  <button onclick="showSection('signup')">选手报名</button>
+  <button onclick="showSection('query')">选手查询</button>
+  <button onclick="showSection('schedule')">比赛赛程</button>
+  <button onclick="showSection('announcements')">公告通知</button>
+  <button onclick="showSection('stats')">数据中心</button>
+  <button onclick="showSection('admin')">组织者后台</button>
+</nav>
+
+<div class="container">
+  <section id="home" class="card active">
+    <div class="title-line"><h2>赛事首页</h2></div>
+    <div class="notice">
+      本系统用于王者比赛报名、战队管理、赛程安排、比赛结果录入、选手评分统计、公告发布与报名二维码分发。<br>
+      选手可查看自己的比赛时间、对手、对手队长联系方式、个人战绩等信息。
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><h3>报名选手</h3><p id="homePlayers">0</p></div>
+      <div class="stat-card"><h3>战队数量</h3><p id="homeTeams">0</p></div>
+      <div class="stat-card"><h3>比赛场次</h3><p id="homeMatches">0</p></div>
+      <div class="stat-card"><h3>公告数量</h3><p id="homeAnnouncements">0</p></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="title-line"><h3>报名二维码</h3></div>
+    <div class="qr-box">
+      <div class="qr-img-wrap">
+        <img id="signupQrImage" alt="报名二维码" src="">
+      </div>
+      <div>
+        <div class="form-group">
+          <label>报名链接</label>
+          <input id="signupLinkInput" type="text" placeholder="请输入公网报名地址，例如：https://你的域名/index.html#signup">
+        </div>
+        <button class="btn blue" onclick="generateSignupQR()">生成报名二维码</button>
+        <button class="btn secondary" onclick="fillCurrentUrl()">使用当前页面地址</button>
+        <p class="small" style="margin-top:10px;">
+          说明：将本网页上传到网站后，把最终网址填入这里，即可生成二维码。<br>
+          建议使用带 <strong>#signup</strong> 的地址，这样选手扫码后会直接进入报名页。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="signup" class="card">
+    <div class="title-line"><h2>选手报名</h2></div>
+    <div class="row">
+      <div class="form-group">
+        <label>选手姓名 / 昵称</label>
+        <input id="name" type="text" placeholder="请输入姓名或昵称">
+      </div>
+      <div class="form-group">
+        <label>联系方式</label>
+        <input id="contact" type="text" placeholder="请输入手机号或微信号">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group">
+        <label>战队名</label>
+        <input id="team" type="text" placeholder="请输入战队名">
+      </div>
+      <div class="form-group">
+        <label>身份</label>
+        <select id="identity">
+          <option value="">请选择身份</option>
+          <option value="队长">队长</option>
+          <option value="组员">组员</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group">
+        <label>游戏ID</label>
+        <input id="gameid" type="text" placeholder="请输入游戏ID">
+      </div>
+      <div class="form-group">
+        <label>平台大区</label>
+        <select id="platform">
+          <option value="">请选择平台</option>
+          <option value="微信区">微信区</option>
+          <option value="QQ区">QQ区</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>擅长位置（可多选）</label>
+      <div class="checkbox-group">
+        <label><input class="lane" type="checkbox" value="对抗路"> 对抗路</label>
+        <label><input class="lane" type="checkbox" value="打野"> 打野</label>
+        <label><input class="lane" type="checkbox" value="中路"> 中路</label>
+        <label><input class="lane" type="checkbox" value="发育路"> 发育路</label>
+        <label><input class="lane" type="checkbox" value="游走"> 游走</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>备注</label>
+      <textarea id="remark" placeholder="可填写段位、常用英雄等信息"></textarea>
+    </div>
+
+    <button class="btn" onclick="submitSignup()">提交报名</button>
+    <button class="btn secondary" onclick="resetForm()">清空表单</button>
+  </section>
+
+  <section id="query" class="card">
+    <div class="title-line"><h2>选手查询</h2></div>
+    <div class="notice">
+      输入你的姓名/昵称，可查看所属战队、比赛时间、对手是谁、对手队长和联系方式、比赛结果、评分、KDA、MVP等信息。
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <label>姓名 / 昵称</label>
+        <input id="queryName" type="text" placeholder="请输入报名时填写的姓名或昵称">
+      </div>
+      <div class="form-group">
+        <label>&nbsp;</label>
+        <button class="btn blue" onclick="queryPlayer()">查询我的比赛信息</button>
+      </div>
+    </div>
+    <div id="queryResult"></div>
+  </section>
+
+  <section id="schedule" class="card">
+    <div class="title-line"><h2>比赛赛程</h2></div>
+    <table>
+      <thead>
+        <tr>
+          <th>比赛编号</th>
+          <th>轮次</th>
+          <th>对阵双方</th>
+          <th>比赛时间</th>
+          <th>状态</th>
+          <th>赛制</th>
+          <th>比分</th>
+          <th>获胜方</th>
+        </tr>
+      </thead>
+      <tbody id="scheduleBody">
+        <tr><td colspan="8">暂无赛程数据</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="announcements" class="card">
+    <div class="title-line"><h2>公告通知</h2></div>
+    <div id="announcementList">
+      <div class="notice">暂无公告</div>
+    </div>
+  </section>
+
+  <section id="stats" class="card">
+    <div class="title-line"><h2>数据中心</h2></div>
+
+    <div class="row">
+      <div class="form-group">
+        <label>战队积分榜排序方式</label>
+        <select id="teamSortType" onchange="renderStats()">
+          <option value="points">按积分排序</option>
+          <option value="diff">按净胜分排序</option>
+          <option value="rate">按胜率排序</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>选手数据榜排序方式</label>
+        <select id="playerSortType" onchange="renderStats()">
+          <option value="avgScore">按平均评分排序</option>
+          <option value="kills">按总击杀排序</option>
+          <option value="assists">按总助攻排序</option>
+          <option value="mvp">按MVP次数排序</option>
+          <option value="appearances">按出场次数排序</option>
+        </select>
+      </div>
+    </div>
+
+    <h3>战队积分榜</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>排名</th>
+          <th>战队</th>
+          <th>比赛场次</th>
+          <th>胜</th>
+          <th>负</th>
+          <th>积分</th>
+          <th>净胜分</th>
+          <th>胜率</th>
+        </tr>
+      </thead>
+      <tbody id="teamStatsBody">
+        <tr><td colspan="8">暂无数据</td></tr>
+      </tbody>
+    </table>
+
+    <div class="divider"></div>
+
+    <h3>选手数据榜</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>排名</th>
+          <th>选手</th>
+          <th>战队</th>
+          <th>出场</th>
+          <th>总击杀</th>
+          <th>总死亡</th>
+          <th>总助攻</th>
+          <th>平均评分</th>
+          <th>MVP次数</th>
+        </tr>
+      </thead>
+      <tbody id="playerStatsBody">
+        <tr><td colspan="9">暂无数据</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="admin" class="card">
+    <div class="title-line"><h2>组织者后台</h2></div>
+    <div class="form-group">
+      <label>后台密码</label>
+      <input id="adminPassword" type="password" placeholder="请输入后台密码">
+    </div>
+    <button class="btn" onclick="adminLogin()">登录后台</button>
+
+    <div id="adminPanel" style="display:none; margin-top:20px;">
+      <div class="notice">
+        已进入组织者后台。你可以管理选手、战队、赛程、比赛数据、评分、公告以及二维码报名链接。
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><h3>报名选手</h3><p id="statPlayers">0</p></div>
+        <div class="stat-card"><h3>战队数量</h3><p id="statTeams">0</p></div>
+        <div class="stat-card"><h3>比赛场次</h3><p id="statMatches">0</p></div>
+        <div class="stat-card"><h3>公告数量</h3><p id="statAnnouncements">0</p></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="title-line"><h3>报名选手管理</h3></div>
+      <div class="toolbar">
+        <input id="playerSearch" type="text" placeholder="搜索选手姓名 / 战队名 / 游戏ID">
+        <select id="playerFilterTeam" onchange="renderAdminPlayers()">
+          <option value="">全部战队</option>
+        </select>
+        <select id="playerFilterIdentity" onchange="renderAdminPlayers()">
+          <option value="">全部身份</option>
+          <option value="队长">队长</option>
+          <option value="组员">组员</option>
+        </select>
+        <button class="btn secondary" onclick="renderAdminPlayers()">搜索/筛选</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>姓名</th>
+            <th>联系方式</th>
+            <th>战队名</th>
+            <th>身份</th>
+            <th>游戏ID</th>
+            <th>平台</th>
+            <th>擅长位置</th>
+            <th>备注</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="adminPlayersBody">
+          <tr><td colspan="9">暂无数据</td></tr>
+        </tbody>
+      </table>
+
+      <div id="playerEditor" style="display:none; margin-top:16px;" class="panel">
+        <h3>编辑选手</h3>
+        <input type="hidden" id="editPlayerId">
+        <div class="row-3">
+          <div class="form-group">
+            <label>姓名</label>
+            <input id="editPlayerName" type="text">
+          </div>
+          <div class="form-group">
+            <label>联系方式</label>
+            <input id="editPlayerContact" type="text">
+          </div>
+          <div class="form-group">
+            <label>战队名</label>
+            <input id="editPlayerTeam" type="text">
+          </div>
+        </div>
+        <div class="row-3">
+          <div class="form-group">
+            <label>身份</label>
+            <select id="editPlayerIdentity">
+              <option value="队长">队长</option>
+              <option value="组员">组员</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>游戏ID</label>
+            <input id="editPlayerGameId" type="text">
+          </div>
+          <div class="form-group">
+            <label>平台</label>
+            <select id="editPlayerPlatform">
+              <option value="微信区">微信区</option>
+              <option value="QQ区">QQ区</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>擅长位置（用顿号分隔）</label>
+          <input id="editPlayerLanes" type="text" placeholder="如：打野、中路">
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <textarea id="editPlayerRemark"></textarea>
+        </div>
+        <button class="btn" onclick="savePlayerEdit()">保存修改</button>
+        <button class="btn gray" onclick="closePlayerEditor()">取消</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="title-line"><h3>战队自动归类</h3></div>
+      <div id="teamList"></div>
+
+      <div class="divider"></div>
+
+      <div class="title-line"><h3>创建比赛</h3></div>
+      <div class="row-4">
+        <div class="form-group">
+          <label>比赛轮次</label>
+          <input id="matchRound" type="text" placeholder="如：小组赛第1轮">
+        </div>
+        <div class="form-group">
+          <label>战队A</label>
+          <select id="teamASelect"></select>
+        </div>
+        <div class="form-group">
+          <label>战队B</label>
+          <select id="teamBSelect"></select>
+        </div>
+        <div class="form-group">
+          <label>比赛时间</label>
+          <input id="matchTime" type="text" placeholder="如：五一劳动节 14:00">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>比赛状态</label>
+          <select id="matchStatus">
+            <option value="未开始">未开始</option>
+            <option value="进行中">进行中</option>
+            <option value="已结束">已结束</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>赛制说明</label>
+          <input id="matchNote" type="text" placeholder="如：BO1 / BO3">
+        </div>
+      </div>
+      <button class="btn blue" onclick="createMatch()">创建比赛</button>
+
+      <div class="divider"></div>
+
+      <div class="title-line"><h3>比赛管理与结果录入</h3></div>
+      <div class="toolbar">
+        <input id="matchSearch" type="text" placeholder="搜索轮次 / 战队名">
+        <select id="matchFilterStatus" onchange="renderMatchesAdmin()">
+          <option value="">全部状态</option>
+          <option value="未开始">未开始</option>
+          <option value="进行中">进行中</option>
+          <option value="已结束">已结束</option>
+        </select>
+        <select id="matchSortType" onchange="renderMatchesAdmin()">
+          <option value="timeDesc">按创建时间倒序</option>
+          <option value="timeAsc">按创建时间正序</option>
+          <option value="status">按状态排序</option>
+          <option value="round">按轮次排序</option>
+        </select>
+        <button class="btn secondary" onclick="renderMatchesAdmin()">搜索/排序</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>编号</th>
+            <th>轮次</th>
+            <th>对阵</th>
+            <th>时间</th>
+            <th>状态</th>
+            <th>赛制</th>
+            <th>比分</th>
+            <th>获胜方</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="adminMatchesBody">
+          <tr><td colspan="9">暂无比赛数据</td></tr>
+        </tbody>
+      </table>
+
+      <div id="matchEditor" style="display:none; margin-top:20px;" class="panel">
+        <h3>比赛结果与选手数据录入</h3>
+        <p id="editingMatchTitle"></p>
+        <div class="row-4">
+          <div class="form-group">
+            <label>战队A比分</label>
+            <input id="editScoreA" type="number" min="0" placeholder="请输入比分">
+          </div>
+          <div class="form-group">
+            <label>战队B比分</label>
+            <input id="editScoreB" type="number" min="0" placeholder="请输入比分">
+          </div>
+          <div class="form-group">
+            <label>比赛状态</label>
+            <select id="editMatchStatus">
+              <option value="未开始">未开始</option>
+              <option value="进行中">进行中</option>
+              <option value="已结束">已结束</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>获胜方</label>
+            <select id="editWinner"></select>
+          </div>
+        </div>
+
+        <div id="playerScoreEditor"></div>
+
+        <button class="btn" onclick="saveMatchResult()">保存比赛结果与数据</button>
+        <button class="btn gray" onclick="closeMatchEditor()">关闭编辑</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="title-line"><h3>发布公告</h3></div>
+      <div class="form-group">
+        <label>公告标题</label>
+        <input id="announcementTitle" type="text" placeholder="请输入公告标题">
+      </div>
+      <div class="form-group">
+        <label>公告内容</label>
+        <textarea id="announcementContent" placeholder="请输入公告内容，例如比赛时间、对手、签到要求、赛程调整等"></textarea>
+      </div>
+      <button class="btn" onclick="publishAnnouncement()">发布公告</button>
+
+      <h3 style="margin-top:20px;">公告管理</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>发布时间</th>
+            <th>标题</th>
+            <th>内容</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="adminAnnouncementBody">
+          <tr><td colspan="4">暂无公告</td></tr>
+        </tbody>
+      </table>
+
+      <div class="divider"></div>
+
+      <div class="title-line"><h3>报名二维码设置</h3></div>
+      <div class="row">
+        <div class="form-group">
+          <label>报名链接</label>
+          <input id="adminSignupLinkInput" type="text" placeholder="请输入公网链接，例如：https://你的域名/index.html#signup">
+        </div>
+        <div class="form-group">
+          <label>&nbsp;</label>
+          <button class="btn blue" onclick="saveSignupLink()">保存报名链接并生成二维码</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="title-line"><h3>系统工具</h3></div>
+      <button class="btn blue" onclick="exportData()">导出本地数据</button>
+      <button class="btn gray" onclick="resetAllData()">清空全部数据</button>
+      <p class="small">导出后会下载一个JSON文件，便于备份报名、赛程、比赛数据和公告。</p>
+    </div>
+  </section>
+</div>
+
+<div class="footer">
+  王者比赛报名与赛事管理系统 · 电竞正式版单文件网页
+</div>
+
+<script>
+  let currentEditingMatchId = null;
+
+  function showSection(id) {
+    document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    location.hash = id;
+    renderAllPublic();
+  }
+
+  function getData(key) {
+    return JSON.parse(localStorage.getItem(key) || '[]');
+  }
+  function setData(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+
+  function getPlayers() { return getData('players'); }
+  function setPlayers(data) { setData('players', data); }
+  function getMatches() { return getData('matches'); }
+  function setMatches(data) { setData('matches', data); }
+  function getAnnouncements() { return getData('announcements'); }
+  function setAnnouncements(data) { setData('announcements', data); }
+  function getSignupLink() { return localStorage.getItem('signupLink') || ''; }
+  function setSignupLink(link) { localStorage.setItem('signupLink', link); }
+
+  function escapeHtml(str='') {
+    return str.replace(/[&<>"']/g, s => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[s]));
+  }
+
+  function submitSignup() {
+    const name = document.getElementById('name').value.trim();
+    const contact = document.getElementById('contact').value.trim();
+    const team = document.getElementById('team').value.trim();
+    const identity = document.getElementById('identity').value;
+    const gameid = document.getElementById('gameid').value.trim();
+    const platform = document.getElementById('platform').value;
+    const remark = document.getElementById('remark').value.trim();
+    const lanes = [...document.querySelectorAll('.lane:checked')].map(i => i.value);
+
+    if (!name || !contact || !team || !identity || !gameid || !platform || lanes.length === 0) {
+      alert('请完整填写报名信息。');
+      return;
+    }
+
+    const players = getPlayers();
+    players.push({
+      id: Date.now(),
+      name, contact, team, identity, gameid, platform, remark, lanes
+    });
+    setPlayers(players);
+    alert('报名成功！');
+    resetForm();
+    renderAll();
+  }
+
+  function resetForm() {
+    document.getElementById('name').value = '';
+    document.getElementById('contact').value = '';
+    document.getElementById('team').value = '';
+    document.getElementById('identity').value = '';
+    document.getElementById('gameid').value = '';
+    document.getElementById('platform').value = '';
+    document.getElementById('remark').value = '';
+    document.querySelectorAll('.lane').forEach(i => i.checked = false);
+  }
+
+  function adminLogin() {
+    const pwd = document.getElementById('adminPassword').value;
+    if (pwd === '123456') {
+      document.getElementById('adminPanel').style.display = 'block';
+      document.getElementById('adminSignupLinkInput').value = getSignupLink();
+      renderAll();
+    } else {
+      alert('后台密码错误。');
+    }
+  }
+
+  function groupTeams(players) {
+    const teams = {};
+    players.forEach(p => {
+      if (!teams[p.team]) teams[p.team] = [];
+      teams[p.team].push(p);
+    });
+    return teams;
+  }
+
+  function getTeamCaptain(teamName) {
+    const players = getPlayers().filter(p => p.team === teamName);
+    return players.find(p => p.identity === '队长') || null;
+  }
+
+  function getTeamMembers(teamName) {
+    return getPlayers().filter(p => p.team === teamName);
+  }
+
+  function renderPlayerFilterOptions() {
+    const players = getPlayers();
+    const teams = Object.keys(groupTeams(players));
+    const el = document.getElementById('playerFilterTeam');
+    if (!el) return;
+    const current = el.value;
+    el.innerHTML = '<option value="">全部战队</option>' + teams.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+    if (teams.includes(current)) el.value = current;
+  }
+
+  function renderAdminPlayers() {
+    const players = getPlayers();
+    const body = document.getElementById('adminPlayersBody');
+    if (!body) return;
+
+    renderPlayerFilterOptions();
+
+    const kw = (document.getElementById('playerSearch')?.value || '').trim().toLowerCase();
+    const teamFilter = document.getElementById('playerFilterTeam')?.value || '';
+    const identityFilter = document.getElementById('playerFilterIdentity')?.value || '';
+
+    let list = players.filter(p => {
+      const matchKw = !kw || [p.name, p.team, p.gameid].join(' ').toLowerCase().includes(kw);
+      const matchTeam = !teamFilter || p.team === teamFilter;
+      const matchIdentity = !identityFilter || p.identity === identityFilter;
+      return matchKw && matchTeam && matchIdentity;
+    });
+
+    if (list.length === 0) {
+      body.innerHTML = '<tr><td colspan="9">暂无符合条件的数据</td></tr>';
+      return;
+    }
+
+    body.innerHTML = list.map(p => `
+      <tr>
+        <td>${escapeHtml(p.name)}</td>
+        <td>${escapeHtml(p.contact)}</td>
+        <td>${escapeHtml(p.team)}</td>
+        <td>${escapeHtml(p.identity)}</td>
+        <td>${escapeHtml(p.gameid)}</td>
+        <td>${escapeHtml(p.platform)}</td>
+        <td>${p.lanes.map(l => `<span class="tag">${escapeHtml(l)}</span>`).join('')}</td>
+        <td>${escapeHtml(p.remark || '-')}</td>
+        <td>
+          <button class="btn secondary" onclick="editPlayer(${p.id})">编辑</button>
+          <button class="btn gray" onclick="deletePlayer(${p.id})">删除</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function editPlayer(id) {
+    const p = getPlayers().find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('playerEditor').style.display = 'block';
+    document.getElementById('editPlayerId').value = p.id;
+    document.getElementById('editPlayerName').value = p.name;
+    document.getElementById('editPlayerContact').value = p.contact;
+    document.getElementById('editPlayerTeam').value = p.team;
+    document.getElementById('editPlayerIdentity').value = p.identity;
+    document.getElementById('editPlayerGameId').value = p.gameid;
+    document.getElementById('editPlayerPlatform').value = p.platform;
+    document.getElementById('editPlayerLanes').value = p.lanes.join('、');
+    document.getElementById('editPlayerRemark').value = p.remark || '';
+  }
+
+  function savePlayerEdit() {
+    const id = Number(document.getElementById('editPlayerId').value);
+    let players = getPlayers();
+    const idx = players.findIndex(x => x.id === id);
+    if (idx === -1) return;
+
+    players[idx] = {
+      ...players[idx],
+      name: document.getElementById('editPlayerName').value.trim(),
+      contact: document.getElementById('editPlayerContact').value.trim(),
+      team: document.getElementById('editPlayerTeam').value.trim(),
+      identity: document.getElementById('editPlayerIdentity').value,
+      gameid: document.getElementById('editPlayerGameId').value.trim(),
+      platform: document.getElementById('editPlayerPlatform').value,
+      lanes: document.getElementById('editPlayerLanes').value.split(/[、,，\s]+/).filter(Boolean),
+      remark: document.getElementById('editPlayerRemark').value.trim()
+    };
+
+    setPlayers(players);
+    alert('选手信息已更新。');
+    closePlayerEditor();
+    renderAll();
+  }
+
+  function closePlayerEditor() {
+    document.getElementById('playerEditor').style.display = 'none';
+  }
+
+  function deletePlayer(id) {
+    if (!confirm('确定删除该选手吗？')) return;
+    let players = getPlayers();
+    players = players.filter(p => p.id !== id);
+    setPlayers(players);
+    renderAll();
+  }
+
+  function renderTeams() {
+    const players = getPlayers();
+    const teamWrap = document.getElementById('teamList');
+    const teamA = document.getElementById('teamASelect');
+    const teamB = document.getElementById('teamBSelect');
+    if (!teamWrap) return;
+
+    const teams = groupTeams(players);
+    const teamNames = Object.keys(teams);
+
+    if (teamNames.length === 0) {
+      teamWrap.innerHTML = '<div class="notice">暂无战队数据</div>';
+      if (teamA) teamA.innerHTML = '<option value="">暂无战队</option>';
+      if (teamB) teamB.innerHTML = '<option value="">暂无战队</option>';
+      return;
+    }
+
+    teamWrap.innerHTML = teamNames.map(teamName => {
+      const members = teams[teamName];
+      const captains = members.filter(m => m.identity === '队长');
+      const captain = captains[0];
+      const normalMembers = members.filter(m => m.identity !== '队长');
+      const tooManyCaptain = captains.length > 1;
+      const memberStatus = members.length >= 5 ? '人数达标' : '人数不足';
+
+      return `
+        <div class="team-box">
+          <h3>${escapeHtml(teamName)}</h3>
+          <p>
+            <span class="pill">队伍人数：${members.length}</span>
+            <span class="pill">${memberStatus}</span>
+            <span class="pill">队长：${captain ? escapeHtml(captain.name) : '未设置'}</span>
+          </p>
+          ${captain ? `<p><strong>队长：</strong>${escapeHtml(captain.name)}（${escapeHtml(captain.gameid)}） | 联系方式：${escapeHtml(captain.contact)}</p>` : `<p class="danger">该战队暂未设置队长</p>`}
+          ${tooManyCaptain ? `<p class="danger">该战队存在多名队长，请调整</p>` : ''}
+          <p><strong>组员：</strong></p>
+          <div>
+            ${normalMembers.length ? normalMembers.map(m => `<span class="tag">${escapeHtml(m.name)}</span>`).join('') : '暂无组员'}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const options = '<option value="">请选择战队</option>' + teamNames.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+    if (teamA) teamA.innerHTML = options;
+    if (teamB) teamB.innerHTML = options;
+  }
+
+  function createMatch() {
+    const round = document.getElementById('matchRound').value.trim();
+    const teamA = document.getElementById('teamASelect').value;
+    const teamB = document.getElementById('teamBSelect').value;
+    const time = document.getElementById('matchTime').value.trim();
+    const status = document.getElementById('matchStatus').value;
+    const note = document.getElementById('matchNote').value.trim();
+
+    if (!round || !teamA || !teamB || !time) {
+      alert('请完整填写比赛信息。');
+      return;
+    }
+    if (teamA === teamB) {
+      alert('战队A和战队B不能相同。');
+      return;
+    }
+
+    const matches = getMatches();
+    matches.push({
+      id: Date.now(),
+      createdAt: Date.now(),
+      round,
+      teamA,
+      teamB,
+      time,
+      status,
+      note,
+      scoreA: '',
+      scoreB: '',
+      winner: '',
+      playerScores: []
+    });
+    setMatches(matches);
+    alert('比赛创建成功。');
+    document.getElementById('matchRound').value = '';
+    document.getElementById('matchTime').value = '';
+    document.getElementById('matchStatus').value = '未开始';
+    document.getElementById('matchNote').value = '';
+    renderAll();
+  }
+
+  function renderMatchesPublic() {
+    const matches = getMatches();
+    const body = document.getElementById('scheduleBody');
+    if (!body) return;
+
+    if (matches.length === 0) {
+      body.innerHTML = '<tr><td colspan="8">暂无赛程数据</td></tr>';
+      return;
+    }
+
+    body.innerHTML = matches.map(m => `
+      <tr>
+        <td>${m.id}</td>
+        <td>${escapeHtml(m.round)}</td>
+        <td>${escapeHtml(m.teamA)} vs ${escapeHtml(m.teamB)}</td>
+        <td>${escapeHtml(m.time)}</td>
+        <td>${escapeHtml(m.status)}</td>
+        <td>${escapeHtml(m.note || '-')}</td>
+        <td>${m.scoreA !== '' && m.scoreB !== '' ? `${m.scoreA} : ${m.scoreB}` : '-'}</td>
+        <td>${escapeHtml(m.winner || '-')}</td>
+      </tr>
+    `).join('');
+  }
+
+  function getSortedFilteredMatches() {
+    let matches = [...getMatches()];
+    const kw = (document.getElementById('matchSearch')?.value || '').trim().toLowerCase();
+    const status = document.getElementById('matchFilterStatus')?.value || '';
+    const sortType = document.getElementById('matchSortType')?.value || 'timeDesc';
+
+    matches = matches.filter(m => {
+      const matchKw = !kw || [m.round, m.teamA, m.teamB].join(' ').toLowerCase().includes(kw);
+      const matchStatus = !status || m.status === status;
+      return matchKw && matchStatus;
+    });
+
+    if (sortType === 'timeDesc') matches.sort((a,b) => (b.createdAt||b.id) - (a.createdAt||a.id));
+    if (sortType === 'timeAsc') matches.sort((a,b) => (a.createdAt||a.id) - (b.createdAt||b.id));
+    if (sortType === 'status') {
+      const order = {'未开始':1,'进行中':2,'已结束':3};
+      matches.sort((a,b) => (order[a.status]||9) - (order[b.status]||9));
+    }
+    if (sortType === 'round') matches.sort((a,b) => String(a.round).localeCompare(String(b.round), 'zh-CN'));
+
+    return matches;
+  }
+
+  function renderMatchesAdmin() {
+    const body = document.getElementById('adminMatchesBody');
+    if (!body) return;
+
+    const matches = getSortedFilteredMatches();
+
+    if (matches.length === 0) {
+      body.innerHTML = '<tr><td colspan="9">暂无比赛数据</td></tr>';
+      return;
+    }
+
+    body.innerHTML = matches.map(m => `
+      <tr>
+        <td>${m.id}</td>
+        <td>${escapeHtml(m.round)}</td>
+        <td>${escapeHtml(m.teamA)} vs ${escapeHtml(m.teamB)}</td>
+        <td>${escapeHtml(m.time)}</td>
+        <td>${escapeHtml(m.status)}</td>
+        <td>${escapeHtml(m.note || '-')}</td>
+        <td>${m.scoreA !== '' && m.scoreB !== '' ? `${m.scoreA} : ${m.scoreB}` : '-'}</td>
+        <td>${escapeHtml(m.winner || '-')}</td>
+        <td>
+          <button class="btn secondary" onclick="editMatch(${m.id})">录入结果/数据</button>
+          <button class="btn gray" onclick="deleteMatch(${m.id})">删除</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function deleteMatch(id) {
+    if (!confirm('确定删除这场比赛吗？')) return;
+    let matches = getMatches();
+    matches = matches.filter(m => m.id !== id);
+    setMatches(matches);
+    renderAll();
+  }
+
+  function editMatch(id) {
+    const matches = getMatches();
+    const players = getPlayers();
+    const match = matches.find(m => m.id === id);
+    if (!match) return;
+
+    currentEditingMatchId = id;
+    document.getElementById('matchEditor').style.display = 'block';
+    document.getElementById('editingMatchTitle').innerHTML = `<strong>${escapeHtml(match.round)}</strong>：${escapeHtml(match.teamA)} vs ${escapeHtml(match.teamB)} | 时间：${escapeHtml(match.time)}`;
+    document.getElementById('editScoreA').value = match.scoreA;
+    document.getElementById('editScoreB').value = match.scoreB;
+    document.getElementById('editMatchStatus').value = match.status;
+
+    document.getElementById('editWinner').innerHTML = `
+      <option value="">请选择获胜方</option>
+      <option value="${escapeHtml(match.teamA)}" ${match.winner === match.teamA ? 'selected' : ''}>${escapeHtml(match.teamA)}</option>
+      <option value="${escapeHtml(match.teamB)}" ${match.winner === match.teamB ? 'selected' : ''}>${escapeHtml(match.teamB)}</option>
+    `;
+
+    const relatedPlayers = players.filter(p => p.team === match.teamA || p.team === match.teamB);
+
+    document.getElementById('playerScoreEditor').innerHTML = `
+      <h3>选手数据录入</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>姓名</th>
+            <th>战队</th>
+            <th>身份</th>
+            <th>评分</th>
+            <th>击杀</th>
+            <th>死亡</th>
+            <th>助攻</th>
+            <th>MVP</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${relatedPlayers.map(p => {
+            const old = (match.playerScores || []).find(s => s.playerId === p.id) || {};
+            return `
+              <tr>
+                <td>${escapeHtml(p.name)}</td>
+                <td>${escapeHtml(p.team)}</td>
+                <td>${escapeHtml(p.identity)}</td>
+                <td><input type="number" min="0" max="10" step="0.1" id="score_${p.id}" value="${old.score ?? ''}" placeholder="评分"></td>
+                <td><input type="number" min="0" id="kills_${p.id}" value="${old.kills ?? ''}" placeholder="击杀"></td>
+                <td><input type="number" min="0" id="deaths_${p.id}" value="${old.deaths ?? ''}" placeholder="死亡"></td>
+                <td><input type="number" min="0" id="assists_${p.id}" value="${old.assists ?? ''}" placeholder="助攻"></td>
+                <td><input type="checkbox" id="mvp_${p.id}" ${old.mvp ? 'checked' : ''}></td>
+                <td><input type="text" id="remark_${p.id}" value="${escapeHtml(old.remark ?? '')}" placeholder="如：关键开团"></td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function closeMatchEditor() {
+    document.getElementById('matchEditor').style.display = 'none';
+    currentEditingMatchId = null;
+  }
+
+  function saveMatchResult() {
+    if (!currentEditingMatchId) return;
+
+    const matches = getMatches();
+    const players = getPlayers();
+    const matchIndex = matches.findIndex(m => m.id === currentEditingMatchId);
+    if (matchIndex === -1) return;
+
+    const match = matches[matchIndex];
+    const scoreA = document.getElementById('editScoreA').value;
+    const scoreB = document.getElementById('editScoreB').value;
+    const status = document.getElementById('editMatchStatus').value;
+    const winner = document.getElementById('editWinner').value;
+
+    const relatedPlayers = players.filter(p => p.team === match.teamA || p.team === match.teamB);
+    const playerScores = relatedPlayers.map(p => ({
+      playerId: p.id,
+      playerName: p.name,
+      team: p.team,
+      score: Number(document.getElementById(`score_${p.id}`).value || 0),
+      kills: Number(document.getElementById(`kills_${p.id}`).value || 0),
+      deaths: Number(document.getElementById(`deaths_${p.id}`).value || 0),
+      assists: Number(document.getElementById(`assists_${p.id}`).value || 0),
+      mvp: document.getElementById(`mvp_${p.id}`).checked,
+      remark: document.getElementById(`remark_${p.id}`).value.trim()
+    }));
+
+    matches[matchIndex] = {
+      ...match,
+      scoreA,
+      scoreB,
+      status,
+      winner,
+      playerScores
+    };
+
+    setMatches(matches);
+    alert('比赛结果与选手数据已保存。');
+    renderAll();
+  }
+
+  function publishAnnouncement() {
+    const title = document.getElementById('announcementTitle').value.trim();
+    const content = document.getElementById('announcementContent').value.trim();
+    if (!title || !content) {
+      alert('请填写公告标题和内容。');
+      return;
+    }
+    const list = getAnnouncements();
+    list.unshift({
+      id: Date.now(),
+      title,
+      content,
+      time: new Date().toLocaleString()
+    });
+    setAnnouncements(list);
+    document.getElementById('announcementTitle').value = '';
+    document.getElementById('announcementContent').value = '';
+    alert('公告发布成功。');
+    renderAll();
+  }
+
+  function deleteAnnouncement(id) {
+    if (!confirm('确定删除该公告吗？')) return;
+    let list = getAnnouncements();
+    list = list.filter(a => a.id !== id);
+    setAnnouncements(list);
+    renderAll();
+  }
+
+  function renderAnnouncements() {
+    const list = getAnnouncements();
+    const publicWrap = document.getElementById('announcementList');
+    const adminBody = document.getElementById('adminAnnouncementBody');
+
+    if (publicWrap) {
+      if (list.length === 0) {
+        publicWrap.innerHTML = '<div class="notice">暂无公告</div>';
+      } else {
+        publicWrap.innerHTML = list.map(a => `
+          <div class="team-box">
+            <h3>${escapeHtml(a.title)}</h3>
+            <p class="small">发布时间：${escapeHtml(a.time)}</p>
+            <p>${escapeHtml(a.content).replace(/\n/g, '<br>')}</p>
+          </div>
+        `).join('');
+      }
+    }
+
+    if (adminBody) {
+      if (list.length === 0) {
+        adminBody.innerHTML = '<tr><td colspan="4">暂无公告</td></tr>';
+      } else {
+        adminBody.innerHTML = list.map(a => `
+          <tr>
+            <td>${escapeHtml(a.time)}</td>
+            <td>${escapeHtml(a.title)}</td>
+            <td>${escapeHtml(a.content).replace(/\n/g, '<br>')}</td>
+            <td><button class="btn gray" onclick="deleteAnnouncement(${a.id})">删除</button></td>
+          </tr>
+        `).join('');
+      }
+    }
+  }
+
+  function queryPlayer() {
+    const name = document.getElementById('queryName').value.trim();
+    const players = getPlayers();
+    const matches = getMatches();
+    const result = document.getElementById('queryResult');
+
+    if (!name) {
+      alert('请输入姓名或昵称。');
+      return;
+    }
+
+    const player = players.find(p => p.name === name);
+    if (!player) {
+      result.innerHTML = '<div class="notice">未查询到该选手，请确认填写的姓名/昵称是否正确。</div>';
+      return;
+    }
+
+    const relatedMatches = matches.filter(m => m.teamA === player.team || m.teamB === player.team);
+    const myRecords = [];
+
+    relatedMatches.forEach(m => {
+      const myScore = (m.playerScores || []).find(s => s.playerId === player.id);
+      if (myScore) myRecords.push(myScore);
+    });
+
+    const totalKills = myRecords.reduce((s, x) => s + (Number(x.kills) || 0), 0);
+    const totalDeaths = myRecords.reduce((s, x) => s + (Number(x.deaths) || 0), 0);
+    const totalAssists = myRecords.reduce((s, x) => s + (Number(x.assists) || 0), 0);
+    const avgScore = myRecords.length ? (myRecords.reduce((s, x) => s + (Number(x.score) || 0), 0) / myRecords.length).toFixed(2) : '-';
+    const mvpCount = myRecords.filter(x => x.mvp).length;
+
+    result.innerHTML = `
+      <div class="team-box">
+        <h3>选手信息</h3>
+        <p><strong>姓名：</strong>${escapeHtml(player.name)}</p>
+        <p><strong>战队：</strong>${escapeHtml(player.team)}</p>
+        <p><strong>身份：</strong>${escapeHtml(player.identity)}</p>
+        <p><strong>平台：</strong>${escapeHtml(player.platform)}</p>
+        <p><strong>擅长位置：</strong>${player.lanes.map(escapeHtml).join('、')}</p>
+      </div>
+
+      <div class="team-box">
+        <h3>个人数据汇总</h3>
+        <p>
+          <span class="pill">出场：${myRecords.length}</span>
+          <span class="pill">总击杀：${totalKills}</span>
+          <span class="pill">总死亡：${totalDeaths}</span>
+          <span class="pill">总助攻：${totalAssists}</span>
+          <span class="pill">平均评分：${avgScore}</span>
+          <span class="pill">MVP：${mvpCount}</span>
+        </p>
+      </div>
+
+      <div class="team-box">
+        <h3>我的比赛</h3>
+        ${
+          relatedMatches.length === 0 ? '暂无比赛安排' :
+          relatedMatches.map(m => {
+            const opponent = m.teamA === player.team ? m.teamB : m.teamA;
+            const opponentCaptain = getTeamCaptain(opponent);
+            const opponentMembers = getTeamMembers(opponent);
+            const myScore = (m.playerScores || []).find(s => s.playerId === player.id);
+
+            return `
+              <div style="margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,.08);">
+                <p><strong>轮次：</strong>${escapeHtml(m.round)}</p>
+                <p><strong>比赛时间：</strong>${escapeHtml(m.time)}</p>
+                <p><strong>对手战队：</strong>${escapeHtml(opponent)}</p>
+                <p><strong>对手队长：</strong>${opponentCaptain ? escapeHtml(opponentCaptain.name) : '-'}</p>
+                <p><strong>对手联系方式：</strong>${opponentCaptain ? escapeHtml(opponentCaptain.contact) : '-'}</p>
+                <p><strong>对手队员：</strong>${opponentMembers.length ? opponentMembers.map(x => escapeHtml(x.name)).join('、') : '-'}</p>
+                <p><strong>状态：</strong>${escapeHtml(m.status)}</p>
+                <p><strong>比分：</strong>${m.scoreA !== '' && m.scoreB !== '' ? `${m.scoreA} : ${m.scoreB}` : '-'}</p>
+                <p><strong>获胜方：</strong>${escapeHtml(m.winner || '-')}</p>
+                <p><strong>我的评分：</strong>${myScore ? myScore.score : '-'}</p>
+                <p><strong>K/D/A：</strong>${myScore ? `${myScore.kills}/${myScore.deaths}/${myScore.assists}` : '-'}</p>
+                <p><strong>MVP：</strong>${myScore && myScore.mvp ? '是' : '否'}</p>
+                <p><strong>备注：</strong>${myScore && myScore.remark ? escapeHtml(myScore.remark) : '-'}</p>
+              </div>
+            `;
+          }).join('')
+        }
+      </div>
+    `;
+  }
+
+  function calcTeamStats() {
+    const players = getPlayers();
+    const teams = Object.keys(groupTeams(players));
+    const matches = getMatches().filter(m => m.status === '已结束');
+
+    let data = teams.map(team => {
+      let played = 0, win = 0, lose = 0, points = 0, diff = 0;
+      matches.forEach(m => {
+        if (m.teamA === team || m.teamB === team) {
+          played++;
+          const a = Number(m.scoreA || 0);
+          const b = Number(m.scoreB || 0);
+          if (m.teamA === team) diff += (a - b);
+          if (m.teamB === team) diff += (b - a);
+
+          if (m.winner === team) {
+            win++;
+            points += 3;
+          } else if (m.winner) {
+            lose++;
+          }
+        }
+      });
+      return {
+        team, played, win, lose, points, diff,
+        rateValue: played ? (win / played) : 0,
+        rate: played ? ((win / played) * 100).toFixed(1) + '%' : '0%'
+      };
+    });
+
+    const sortType = document.getElementById('teamSortType')?.value || 'points';
+    if (sortType === 'points') data.sort((a,b) => b.points - a.points || b.diff - a.diff);
+    if (sortType === 'diff') data.sort((a,b) => b.diff - a.diff || b.points - a.points);
+    if (sortType === 'rate') data.sort((a,b) => b.rateValue - a.rateValue || b.points - a.points);
+
+    return data;
+  }
+
+  function calcPlayerStats() {
+    const players = getPlayers();
+    const matches = getMatches();
+    const map = {};
+
+    players.forEach(p => {
+      map[p.id] = {
+        playerId: p.id,
+        name: p.name,
+        team: p.team,
+        appearances: 0,
+        kills: 0,
+        deaths: 0,
+        assists: 0,
+        scoreTotal: 0,
+        scoreCount: 0,
+        mvp: 0
+      };
+    });
+
+    matches.forEach(m => {
+      (m.playerScores || []).forEach(s => {
+        if (!map[s.playerId]) return;
+        map[s.playerId].appearances += 1;
+        map[s.playerId].kills += Number(s.kills || 0);
+        map[s.playerId].deaths += Number(s.deaths || 0);
+        map[s.playerId].assists += Number(s.assists || 0);
+        map[s.playerId].scoreTotal += Number(s.score || 0);
+        map[s.playerId].scoreCount += 1;
+        if (s.mvp) map[s.playerId].mvp += 1;
+      });
+    });
+
+    let data = Object.values(map).map(x => ({
+      ...x,
+      avgScore: x.scoreCount ? (x.scoreTotal / x.scoreCount).toFixed(2) : '0.00'
+    }));
+
+    const sortType = document.getElementById('playerSortType')?.value || 'avgScore';
+    if (sortType === 'avgScore') data.sort((a,b) => Number(b.avgScore) - Number(a.avgScore) || b.kills - a.kills);
+    if (sortType === 'kills') data.sort((a,b) => b.kills - a.kills || Number(b.avgScore) - Number(a.avgScore));
+    if (sortType === 'assists') data.sort((a,b) => b.assists - a.assists || Number(b.avgScore) - Number(a.avgScore));
+    if (sortType === 'mvp') data.sort((a,b) => b.mvp - a.mvp || Number(b.avgScore) - Number(a.avgScore));
+    if (sortType === 'appearances') data.sort((a,b) => b.appearances - a.appearances || Number(b.avgScore) - Number(a.avgScore));
+
+    return data;
+  }
+
+  function renderStats() {
+    const players = getPlayers();
+    const teams = Object.keys(groupTeams(players));
+    const matches = getMatches();
+    const announcements = getAnnouncements();
+
+    const sp = document.getElementById('statPlayers');
+    const st = document.getElementById('statTeams');
+    const sm = document.getElementById('statMatches');
+    const sa = document.getElementById('statAnnouncements');
+
+    if (sp) sp.textContent = players.length;
+    if (st) st.textContent = teams.length;
+    if (sm) sm.textContent = matches.length;
+    if (sa) sa.textContent = announcements.length;
+
+    const hp = document.getElementById('homePlayers');
+    const ht = document.getElementById('homeTeams');
+    const hm = document.getElementById('homeMatches');
+    const ha = document.getElementById('homeAnnouncements');
+    if (hp) hp.textContent = players.length;
+    if (ht) ht.textContent = teams.length;
+    if (hm) hm.textContent = matches.length;
+    if (ha) ha.textContent = announcements.length;
+
+    const teamBody = document.getElementById('teamStatsBody');
+    const playerBody = document.getElementById('playerStatsBody');
+
+    const teamStats = calcTeamStats();
+    const playerStats = calcPlayerStats();
+
+    if (teamBody) {
+      if (!teamStats.length) {
+        teamBody.innerHTML = '<tr><td colspan="8">暂无数据</td></tr>';
+      } else {
+        teamBody.innerHTML = teamStats.map((t, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${escapeHtml(t.team)}</td>
+            <td>${t.played}</td>
+            <td>${t.win}</td>
+            <td>${t.lose}</td>
+            <td>${t.points}</td>
+            <td>${t.diff}</td>
+            <td>${t.rate}</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    if (playerBody) {
+      if (!playerStats.length) {
+        playerBody.innerHTML = '<tr><td colspan="9">暂无数据</td></tr>';
+      } else {
+        playerBody.innerHTML = playerStats.map((p, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${escapeHtml(p.name)}</td>
+            <td>${escapeHtml(p.team)}</td>
+            <td>${p.appearances}</td>
+            <td>${p.kills}</td>
+            <td>${p.deaths}</td>
+            <td>${p.assists}</td>
+            <td>${p.avgScore}</td>
+            <td>${p.mvp}</td>
+          </tr>
+        `).join('');
+      }
+    }
+  }
+
+  function generateQR(url) {
+    return `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(url)}`;
+  }
+
+  function generateSignupQR() {
+    const input = document.getElementById('signupLinkInput');
+    const img = document.getElementById('signupQrImage');
+    const link = input.value.trim();
+    if (!link) {
+      alert('请先输入报名链接。');
+      return;
+    }
+    setSignupLink(link);
+    img.src = generateQR(link);
+    const adminInput = document.getElementById('adminSignupLinkInput');
+    if (adminInput) adminInput.value = link;
+  }
+
+  function fillCurrentUrl() {
+    let url = window.location.href.split('#')[0] + '#signup';
+    document.getElementById('signupLinkInput').value = url;
+    generateSignupQR();
+  }
+
+  function saveSignupLink() {
+    const input = document.getElementById('adminSignupLinkInput').value.trim();
+    if (!input) {
+      alert('请输入报名链接。');
+      return;
+    }
+    setSignupLink(input);
+    document.getElementById('signupLinkInput').value = input;
+    document.getElementById('signupQrImage').src = generateQR(input);
+    alert('报名链接已保存，二维码已更新。');
+  }
+
+  function loadSignupQR() {
+    const link = getSignupLink();
+    const img = document.getElementById('signupQrImage');
+    const input1 = document.getElementById('signupLinkInput');
+    if (input1) input1.value = link;
+    if (link && img) img.src = generateQR(link);
+    else if (img) img.src = '';
+  }
+
+  function exportData() {
+    const data = {
+      players: getPlayers(),
+      matches: getMatches(),
+      announcements: getAnnouncements(),
+      signupLink: getSignupLink(),
+      exportTime: new Date().toLocaleString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '王者比赛管理数据备份.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function resetAllData() {
+    if (!confirm('确定清空全部本地数据吗？该操作不可恢复。')) return;
+    localStorage.removeItem('players');
+    localStorage.removeItem('matches');
+    localStorage.removeItem('announcements');
+    localStorage.removeItem('signupLink');
+    alert('已清空全部数据。');
+    renderAll();
+    document.getElementById('queryResult').innerHTML = '';
+    loadSignupQR();
+  }
+
+  function renderAllPublic() {
+    renderMatchesPublic();
+    renderAnnouncements();
+    renderStats();
+    loadSignupQR();
+  }
+
+  function renderAll() {
+    renderAdminPlayers();
+    renderTeams();
+    renderMatchesPublic();
+    renderMatchesAdmin();
+    renderAnnouncements();
+    renderStats();
+    loadSignupQR();
+  }
+
+  function initHash() {
+    const hash = (location.hash || '').replace('#', '');
+    const ids = ['home','signup','query','schedule','announcements','stats','admin'];
+    if (ids.includes(hash)) {
+      document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
+      document.getElementById(hash).classList.add('active');
+    }
+  }
+
+  initHash();
+  renderAll();
+</script>
+</body>
+</html>
